@@ -1,0 +1,21 @@
+.img-home-logo {
+    width: 23%;
+    margin-top: 60px;
+}
+
+.text-logo {
+    font-size: 28px;
+    margin-top: 30px;
+}
+
+.cards {
+    display: flex;
+    justify-content: space-evenly;
+    margin-top: 50px;
+}
+
+.card {
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+}
