@@ -10,6 +10,7 @@ if (isset($_SESSION['role'])) {
     $female = $_SESSION['female'];
     $image = $_SESSION['image'];
     $password = $_SESSION['password'];
+    $image = $_SESSION['image'];
     $id = $_SESSION['id'];
     if ($role == 2) {
         $teacher_id = $id;
@@ -56,14 +57,13 @@ if (isset($_SESSION['role'])) {
                         </li>
                         <?php if ($role == 1) { ?>
                             <li class="nav-item">
-                                <a class="nav-link" href="#">Моё обучение</a>
+                                <a class="nav-link" href="../../../diploma-project/php/my_favourate_course.php">Моё обучение</a>
                             </li>
                         <?php } else if ($role == 2) { ?>
                             <li class="nav-item">
                                 <a class="nav-link" href="../../../diploma-project/php/my_work_courses.php">Преподавание</a>
                             </li>
                         <?php } ?>
-
 
                     </ul>
                     <form class="d-flex" role="search">

@@ -25,10 +25,12 @@ if ($result1->num_rows > 0) {
     $_SESSION['image'] = $row['image'];
     $_SESSION['password'] = $row['password'];
     $_SESSION['id'] = $row['id'];
+    $_SESSION['image'] = $row['image'];
     header("Location: ../catalog.php");
     exit();
 } else {
     // Ошибка авторизации
     echo "Неверный email или пароль";
 }
+
 ?>

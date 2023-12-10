@@ -2,9 +2,9 @@
 include_once "./base/header.php";
 ?>
 
-<div class="p-2 text-white bg-opacity-75" style="height: 300px; background-color: #173038;">
+<div class="p-2 text-white bg-opacity-75" style="height: 400px; background-image: url(../image/profile/3.jpg);">
     <div class="text-center">
-        <img src="../image/profile/1.svg" class="rounded" width="18%" style="margin-top: 160px;">
+        <img src="../image/profile/1.svg" class="rounded" width="18%" style="margin-top: 260px;">
     </div>
 </div>
 
