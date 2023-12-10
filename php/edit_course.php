@@ -100,7 +100,7 @@ if (isset($_GET['id'])) {
                 if ($lessonsResult->num_rows > 0) {
                     echo "<ul>";
                     while ($lessonRow = $lessonsResult->fetch_assoc()) {
-                        echo "<li>{$lessonRow['title']} (<a href='../php/database/delete_lesson.php?lesson_id={$lessonRow['id']}'>Удалить урок</a>)</li>";
+                        echo "<li><a href='../../diploma-project/php/lesson_details.php?lesson_id={$lessonRow['id']}'>{$lessonRow['title']}</a> (<a href='../php/database/delete_lesson.php?lesson_id={$lessonRow['id']}'>Удалить урок</a>)</li>";
                     }
                     echo "</ul>";
                 } else {
