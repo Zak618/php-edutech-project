@@ -21,40 +21,50 @@ if (isset($_GET['lesson_id'])) {
         $materialsResult = $conn->query($materialsSql);
 ?>
         <div class="container mt-5">
-            <h1>Курс: <?php echo $lessonRow['course_title']; ?></h1>
-            <h2>Модуль: <?php echo $lessonRow['module_title']; ?></h2>
-            <h3>Урок: <?php echo $lessonRow['lesson_title']; ?></h3>
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h1 class="card-title">Курс: <?php echo $lessonRow['course_title']; ?></h1>
+                    <h2 class="card-subtitle mb-2 text-muted">Модуль: <?php echo $lessonRow['module_title']; ?></h2>
+                    <h3 class="card-subtitle mb-2 text-muted">Урок: <?php echo $lessonRow['lesson_title']; ?></h3>
+                </div>
+            </div>
 
- 
             <?php if ($materialsResult->num_rows > 0) { ?>
-                <div class="mt-3">
-                    <h4>Материалы урока:</h4>
-                    <ul>
-                        <?php while ($materialRow = $materialsResult->fetch_assoc()) { ?>
-                            <li>
-                                <?php
-                                // Отобразите информацию о материале в соответствии с его типом
-                                if ($materialRow['type'] == 'text') {
-                                    echo "Текстовая информация: " . $materialRow['content'];
-                                } elseif ($materialRow['type'] == 'test') {
-                                    echo "Тестовая задача: " . $materialRow['question'];
-                                    // Дополнительная логика для отображения вариантов ответов и правильных ответов
-                                }
-                                ?>
-                            </li>
-                        <?php } ?>
-                    </ul>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h4 class="card-title">Материалы урока:</h4>
+                        <ul>
+                            <?php while ($materialRow = $materialsResult->fetch_assoc()) { ?>
+                                <li>
+                                    <?php
+                                    $materialLink = ($materialRow['type'] == 'text') ? 'text_material.php' : 'test_material.php';
+                            
+                                    $materialLink .= '?material_id=' . $materialRow['id'];
+                                    ?>
+                                    <a href="<?php echo $materialLink; ?>">
+                                        <?php
+                                        // Отображаем краткую информацию о материале
+                                        echo ($materialRow['type'] == 'text') ? "Текстовая информация" : "Тестовая задача";
+                                        ?>
+                                    </a>
+                                </li>
+                            <?php } ?>
+
+                        </ul>
+                    </div>
                 </div>
             <?php } else { ?>
-                <p>Урок не содержит материалов.</p>
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <p class="card-text">Урок не содержит материалов.</p>
+                    </div>
+                </div>
             <?php } ?>
-
 
             <div class="mt-3">
                 <!-- Кнопка для добавления материала -->
                 <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMaterialModal">Добавить материал</button>
             </div>
-
             <!-- Модальное окно для добавления материала -->
             <div class="modal fade" id="addMaterialModal" tabindex="-1" aria-labelledby="addMaterialModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
