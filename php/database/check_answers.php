@@ -18,9 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $materialRow = $materialResult->fetch_assoc();
             $correctAnswers = $materialRow['correct_answer'];
             $selectedAnswers = implode(",", $postData['selectedAnswers']);
+            $selectedAnswers = intval($selectedAnswers) + 1;
 
             // Сравниваем выбранные ответы с правильными
-            $result = ($correctAnswers === $selectedAnswers);
+            $result = ($correctAnswers == $selectedAnswers);
 
             // Выводим результат в формате JSON
             echo json_encode(['result' => $result]);

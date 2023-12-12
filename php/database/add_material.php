@@ -27,6 +27,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             'correct_answer' => implode(', ', $_POST['correctAnswers'])
         );
 
+        // Проверяем, есть ли выбранные правильные ответы
+        if (empty($test_fields['correct_answer'])) {
+            echo "Не выбран правильный ответ для тестовой задачи.";
+            exit();
+        }
+
         $material_data = array_merge($common_fields, $test_fields);
     }
 
@@ -57,5 +63,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     echo "Некорректный метод запроса.";
 }
 
-include_once "./base/footer.php";
+include_once "../base/footer.php";
 ?>
