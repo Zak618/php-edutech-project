@@ -1,67 +1,42 @@
 <?php
-include_once "../base/header.php";
-include_once "../database/db.php";
+include_once "../../../diploma-project/php/database/db.php";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Получаем данные из формы
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Проверяем, были ли переданы данные методом POST
     $lesson_id = $_POST['lesson_id'];
     $material_type = $_POST['materialType'];
 
-    // Общие поля для всех типов материалов
-    $common_fields = array(
-        'lesson_id' => $lesson_id,
-        'type' => $material_type
-    );
+    // В зависимости от типа материала обрабатываем данные
+    if ($material_type === 'text') {
+        $text_content = $_POST['textMaterialContent'];
 
-    // В зависимости от типа материала выбираем дополнительные поля
-    if ($material_type == 'text') {
-        $text_fields = array(
-            'content' => $_POST['textMaterialContent']
-        );
+        // Добавляем текстовый материал в базу данных
+        $insertTextMaterialSql = "INSERT INTO materials (lesson_id, type, content) VALUES ('$lesson_id', 'text', '$text_content')";
+        $conn->query($insertTextMaterialSql);
 
-        $material_data = array_merge($common_fields, $text_fields);
-    } elseif ($material_type == 'test') {
-        $test_fields = array(
-            'question' => $_POST['testMaterialQuestion'],
-            'options' => implode(', ', $_POST['testMaterialOptions']),
-            'correct_answer' => implode(', ', $_POST['correctAnswers'])
-        );
+    } elseif ($material_type === 'test') {
+        $test_question = $_POST['testMaterialQuestion'];
+        $test_options = $_POST['testMaterialOptions'];
+        $correct_answers = $_POST['correctAnswers'];
 
-        // Проверяем, есть ли выбранные правильные ответы
-        if (empty($test_fields['correct_answer'])) {
-            echo "Не выбран правильный ответ для тестовой задачи.";
-            exit();
-        }
+        // Преобразуем индексы ответов (начиная с 1) в числа и вычитаем 1
+        $correct_answers = array_map(function ($value) {
+            return intval($value);
+        }, $correct_answers);
 
-        $material_data = array_merge($common_fields, $test_fields);
+        // Сериализуем массив в строку для хранения в базе данных
+        $serialized_options = implode(",", $test_options);
+        $serialized_correct_answers = implode(",", $correct_answers);
+
+        // Добавляем тестовый материал в базу данных
+        $insertTestMaterialSql = "INSERT INTO materials (lesson_id, type, question, options, correct_answer) VALUES ('$lesson_id', 'test', '$test_question', '$serialized_options', '$serialized_correct_answers')";
+        $conn->query($insertTestMaterialSql);
     }
-
-    // Вставляем данные в базу данных
-    $insertSql = "INSERT INTO materials (lesson_id, type, content, question, options, correct_answer)
-                  VALUES (?, ?, ?, ?, ?, ?)";
-
-    $stmt = $conn->prepare($insertSql);
-
-    if ($stmt) {
-        // Привязываем параметры
-        $stmt->bind_param('ssssss', $material_data['lesson_id'], $material_data['type'],
-            $material_data['content'], $material_data['question'], $material_data['options'], $material_data['correct_answer']);
-
-        // Выполняем запрос
-        $stmt->execute();
-
-        // Закрываем запрос
-        $stmt->close();
-        
-        // Редирект на страницу урока после добавления материала
-        header("Location: ../../../diploma-project/php/lesson_details.php?lesson_id=$lesson_id");
-        exit();
-    } else {
-        echo "Ошибка при подготовке запроса: " . $conn->error;
-    }
+   
+    // Перенаправляем пользователя обратно на страницу урока
+    header("Location: ../../../diploma-project/php/lesson_details.php?lesson_id=$lesson_id");
 } else {
-    echo "Некорректный метод запроса.";
+    // Если запрос не методом POST, возвращаем ошибку
+    echo json_encode(['error' => 'Неверный метод запроса.']);
 }
-
-include_once "../base/footer.php";
 ?>
