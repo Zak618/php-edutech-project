@@ -2,6 +2,9 @@
 include_once "./base/header.php";
 include_once "../php/database/db.php";
 
+// Предполагаем, что у вас есть информация о пользователе и его роли
+$userRole = $role; // Замените на реальное получение роли пользователя
+
 if (isset($_GET['lesson_id'])) {
     $lesson_id = $_GET['lesson_id'];
 
@@ -16,9 +19,15 @@ if (isset($_GET['lesson_id'])) {
 
     if ($lessonResult->num_rows > 0) {
         $lessonRow = $lessonResult->fetch_assoc();
-        // Получаем материалы урока
-        $materialsSql = "SELECT * FROM materials WHERE lesson_id = '$lesson_id'";
-        $materialsResult = $conn->query($materialsSql);
+
+        // Предполагаем, что creator_role - это роль создателя курса
+        $creatorRole = 2;
+
+        // Проверяем, является ли текущий пользователь создателем курса
+        if ($userRole == $creatorRole) {
+            // Получаем материалы урока
+            $materialsSql = "SELECT * FROM materials WHERE lesson_id = '$lesson_id'";
+            $materialsResult = $conn->query($materialsSql);
 ?>
         <div class="container mt-5">
             <div class="card mb-3">
@@ -173,7 +182,10 @@ if (isset($_GET['lesson_id'])) {
             </script>
 
 
-    <?php
+<?php
+        } else {
+            echo "У вас нет прав для редактирования материалов урока.";
+        }
     } else {
         echo "Урок не найден.";
     }
@@ -182,4 +194,4 @@ if (isset($_GET['lesson_id'])) {
 }
 
 include_once "./base/footer.php";
-    ?>
+?>
