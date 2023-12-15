@@ -83,6 +83,13 @@ if (isset($_GET['course_id'])) {
         <form method="post">
             <input type="submit" name="continue_course" value="Продолжить" class="btn btn-success">
         </form>
+<?php
+if (isset($_POST['continue_course'])) {
+    // Редиректим на страницу с модулями и уроками
+    header("Location: course_progress.php?course_id=$courseId");
+    exit();
+}
+?>
     <?php endif; ?>
 <?php endif; ?>
 
