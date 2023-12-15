@@ -74,11 +74,17 @@ if (isset($_GET['course_id'])) {
     <p align="center"><?php echo $course['description']; ?></p>
 
     <!-- Проверка, записан ли студент на этот курс -->
-    <?php if ($role == 1 && !$isEnrolled): ?>
+    <?php if ($role == 1): ?>
+    <?php if (!$isEnrolled): ?>
         <form method="post">
             <input type="submit" name="enroll_course" value="Записаться на курс" class="btn btn-primary">
         </form>
+    <?php else: ?>
+        <form method="post">
+            <input type="submit" name="continue_course" value="Продолжить" class="btn btn-success">
+        </form>
     <?php endif; ?>
+<?php endif; ?>
 
     <!-- Вывод информации о модулях -->
     <?php if (!empty($modules)): ?>
