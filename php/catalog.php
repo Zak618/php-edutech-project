@@ -44,7 +44,7 @@ $result = $conn->query($sql);
                     }
                 } elseif ($role == 1) {
                     // Если пользователь - студент, то выводим кнопку "Проходить"
-                    echo '<a href="#" class="btn btn-primary">Проходить</a>';
+                    echo '<a href="course_details.php?course_id=' . $row['id'] . '" class="btn btn-primary">Проходить</a>';
                 }
 
                 echo '</div></div>';
