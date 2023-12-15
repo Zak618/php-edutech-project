@@ -11,10 +11,20 @@ if (isset($_GET['material_id'])) {
 
     if ($materialResult->num_rows > 0) {
         $materialRow = $materialResult->fetch_assoc();
+        $lesson_id = $materialRow['lesson_id'];
 
-   
         $userRole = $role; 
-        $creatorRole = 2; 
+        $creatorRole = 2;
+
+        // Получаем предыдущий материал
+        $prevMaterialSql = "SELECT * FROM materials WHERE lesson_id = '$lesson_id' AND id < $material_id ORDER BY id DESC LIMIT 1";
+        $prevMaterialResult = $conn->query($prevMaterialSql);
+        $prevMaterial = ($prevMaterialResult->num_rows > 0) ? $prevMaterialResult->fetch_assoc() : null;
+
+        // Получаем следующий материал
+        $nextMaterialSql = "SELECT * FROM materials WHERE lesson_id = '$lesson_id' AND id > $material_id ORDER BY id ASC LIMIT 1";
+        $nextMaterialResult = $conn->query($nextMaterialSql);
+        $nextMaterial = ($nextMaterialResult->num_rows > 0) ? $nextMaterialResult->fetch_assoc() : null;
 
         // Проверяем, является ли текущий пользователь преподавателем
         if ($userRole == $creatorRole) {
@@ -58,6 +68,21 @@ if (isset($_GET['material_id'])) {
                                 <button type="submit" class="btn btn-primary mt-3">Сохранить изменения</button>
                             </form>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container mt-3">
+                <div class="row">
+                    <div class="col-6">
+                        <?php if ($prevMaterial) { ?>
+                            <a class="btn btn-secondary" href="text_material.php?material_id=<?php echo $prevMaterial['id']; ?>">Назад</a>
+                        <?php } ?>
+                    </div>
+                    <div class="col-6 text-end">
+                        <?php if ($nextMaterial) { ?>
+                            <a class="btn btn-secondary" href="text_material.php?material_id=<?php echo $nextMaterial['id']; ?>">Далее</a>
+                        <?php } ?>
                     </div>
                 </div>
             </div>
@@ -137,6 +162,21 @@ if (isset($_GET['material_id'])) {
                 <div class="card mb-3">
                     <div class="card-body">
                         <p><?php echo $materialRow['content']; ?></p>
+                    </div>
+                </div>
+
+                <div class="container mt-3">
+                    <div class="row">
+                        <div class="col-6">
+                            <?php if ($prevMaterial) { ?>
+                                <a class="btn btn-secondary" href="text_material.php?material_id=<?php echo $prevMaterial['id']; ?>">Назад</a>
+                            <?php } ?>
+                        </div>
+                        <div class="col-6 text-end">
+                            <?php if ($nextMaterial) { ?>
+                                <a class="btn btn-secondary" href="text_material.php?material_id=<?php echo $nextMaterial['id']; ?>">Далее</a>
+                            <?php } ?>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -46,7 +46,7 @@ if (isset($_GET['lesson_id'])) {
                             <?php while ($materialRow = $materialsResult->fetch_assoc()) { ?>
                                 <li>
                                     <?php
-                                    $materialLink = ($materialRow['type'] == 'text') ? 'text_material.php' : 'test_material.php';
+                                    $materialLink = ($materialRow['type'] == 'text') ? 'material.php' : 'material.php';
                             
                                     $materialLink .= '?material_id=' . $materialRow['id'];
                                     ?>
