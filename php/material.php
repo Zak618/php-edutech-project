@@ -46,6 +46,13 @@ if (isset($_GET['material_id'])) {
                     if ($materialRow['type'] == 'text') {
                         echo "<h1 class='card-title'>Текстовая информация</h1>";
                         echo "<p>{$materialRow['content']}</p>";
+                        if ($role == 2 && $materialRow['type'] == 'text') { ?>
+                            <div class="mb-3">
+                            <button class="btn btn-primary" onclick="editMaterial(<?php echo $materialRow['id']; ?>)">Редактировать</button>
+                            <!-- Кнопка для удаления материала -->
+                            <button class="btn btn-danger" onclick="removeMaterial(<?php echo $materialRow['id']; ?>)">Удалить материал</button>
+                            </div>
+                        <?php }
                     } elseif ($materialRow['type'] == 'test') {
                         echo "<h1 class='card-title'>Тестовая задача</h1>";
 
@@ -66,12 +73,34 @@ if (isset($_GET['material_id'])) {
                         if ($role == 2) {
                             echo "<button class='btn btn-danger' onclick='deleteTest($material_id)'>Удалить тест</button>";
                         }
-
+                        
                         echo "</form>";
 
                         echo "<div class='mt-3' id='resultContainer'></div>";
                     }
                     ?>
+                </div>
+            </div>
+
+
+            <!-- Модальное окно для редактирования текстового материала -->
+            <div class="modal fade" id="editMaterialModal" tabindex="-1" aria-labelledby="editMaterialModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="editMaterialModalLabel">Редактировать текстовый материал</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- Форма для редактирования текстового материала -->
+                            <form id="editMaterialForm" action="../../diploma-project/php/database/update_material.php" method="post">
+                                <input type="hidden" name="material_id" value="<?php echo $materialRow['id']; ?>">
+                                <label for="materialContent" class="form-label">Текстовое содержание:</label>
+                                <textarea class="form-control" name="materialContent"><?php echo $materialRow['content']; ?></textarea>
+                                <button type="submit" class="btn btn-primary mt-3">Сохранить изменения</button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -165,6 +194,73 @@ if (isset($_GET['material_id'])) {
                     });
                 }
             }
+
+            function editMaterial(materialId) {
+    // Проверка типа материала
+    var materialContent = '<?php echo addslashes($materialRow['content']); ?>';
+
+    // Установка значений в модальном окне перед открытием
+    document.getElementById('editMaterialForm').elements.material_id.value = materialId;
+    document.getElementById('editMaterialForm').elements.materialContent.value = materialContent;
+
+    // Открытие модального окна
+    $('#editMaterialModal').modal('show');
+}
+
+
+
+$(document).ready(function () {
+        // Обработка формы редактирования
+        $('#editMaterialForm').submit(function (e) {
+            e.preventDefault();
+
+            var form = $(this);
+            var url = form.attr('action');
+            var formData = form.serialize();
+
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: formData,
+                success: function (response) {
+                    // Закрываем модальное окно
+                    $('#editMaterialModal').modal('hide');
+
+                    // Обновляем текст материала на странице
+                    $('#materialContent').text(form.find('textarea[name="materialContent"]').val());
+                },
+                error: function (error) {
+                    console.log('Error:', error);
+                }
+            });
+        });
+    });
+
+    
+
+                function removeMaterial(materialId) {
+                    if (confirm('Вы уверены, что хотите удалить этот материал?')) {
+                        $.ajax({
+                            type: 'POST',
+                            url: './database/delete_material.php',
+                            data: {
+                                material_id: materialId
+                            },
+                            success: function(response) {
+                                var result = JSON.parse(response);
+                                if (result.status === 'success') {
+                                    // Перенаправляем пользователя на страницу с уроками (или иную страницу)
+                                    window.location.href = './lesson_details.php?lesson_id=<?php echo $materialRow['lesson_id']; ?>'; // Замените 'lessons.php' на нужный URL
+                                } else {
+                                    console.error('Ошибка удаления материала: ', result.message);
+                                }
+                            },
+                            error: function(error) {
+                                console.error('Ошибка удаления материала: ', error);
+                            }
+                        });
+                    }
+                }
         </script>
 <?php
     } else {
