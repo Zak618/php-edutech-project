@@ -61,7 +61,11 @@ if (isset($_GET['course_id'])) {
                     <ul>
                         <?php foreach ($lessons as $lesson): ?>
                             <?php if ($lesson['module_id'] == $module['id']): ?>
-                                <li><?php echo $lesson['title']; ?></li>
+                                <li>
+                                    <a href="material.php?material_id=<?php echo $lesson['id']; ?>">
+                                        <?php echo $lesson['title']; ?>
+                                    </a>
+                                </li>
                             <?php endif; ?>
                         <?php endforeach; ?>
                     </ul>

@@ -46,16 +46,14 @@ if (isset($_GET['material_id'])) {
                     if ($materialRow['type'] == 'text') {
                         echo "<h1 class='card-title'>Текстовая информация</h1>";
                         echo "<p>{$materialRow['content']}</p>";
-                        if ($role == 2 && $materialRow['type'] == 'text') { ?>
-                            <div class="mb-3">
-                            <button class="btn btn-primary" onclick="editMaterial(<?php echo $materialRow['id']; ?>)">Редактировать</button>
-                            <!-- Кнопка для удаления материала -->
-                            <button class="btn btn-danger" onclick="removeMaterial(<?php echo $materialRow['id']; ?>)">Удалить материал</button>
-                            </div>
-                        <?php }
+                        if ($role == 2 && $materialRow['type'] == 'text') {
+                            echo "<div class=\"mb-3\">";
+                            echo "<button class=\"btn btn-primary\" onclick=\"editMaterial(" . $materialRow['id'] . ")\">Редактировать</button>";
+                            echo "<button class=\"btn btn-danger\" onclick=\"removeMaterial(" . $materialRow['id'] . ")\">Удалить материал</button>";
+                            echo "</div>";
+                        }
                     } elseif ($materialRow['type'] == 'test') {
                         echo "<h1 class='card-title'>Тестовая задача</h1>";
-
                         echo "<form id='answerForm'>";
                         echo "<input type='hidden' name='material_id' value='$material_id'>";
                         echo "<p>Вопрос: {$materialRow['question']}</p>";
@@ -69,16 +67,16 @@ if (isset($_GET['material_id'])) {
                             echo "</div>";
                         }
 
-                        echo "<button type='button' class='btn btn-primary mt-3' onclick='checkAnswers($material_id)'>Ответить</button>";
+                        echo "<button type='button' class='btn btn-primary mt-3' onclick='checkAnswers(" . $material_id . ")'>Ответить</button>";
                         if ($role == 2) {
-                            echo "<button class='btn btn-danger' onclick='deleteTest($material_id)'>Удалить тест</button>";
+                            echo "<button class='btn btn-danger' onclick='deleteTest(" . $material_id . ")'>Удалить тест</button>";
                         }
-                        
-                        echo "</form>";
 
+                        echo "</form>";
                         echo "<div class='mt-3' id='resultContainer'></div>";
                     }
                     ?>
+
                 </div>
             </div>
 
@@ -153,6 +151,9 @@ if (isset($_GET['material_id'])) {
                     });
             }
 
+
+
+
             function getSelectedAnswers() {
                 var selectedAnswers = [];
                 var checkboxes = document.querySelectorAll('input[name="selectedAnswers[]"]:checked');
@@ -160,7 +161,7 @@ if (isset($_GET['material_id'])) {
                     selectedAnswers.push(checkbox.value);
                 });
                 return selectedAnswers;
-            }
+            };
 
             function showResultMessage(message, alertClass) {
                 var resultMessage = document.createElement('div');
@@ -170,7 +171,7 @@ if (isset($_GET['material_id'])) {
                 var resultContainer = document.getElementById('resultContainer');
                 resultContainer.innerHTML = '';
                 resultContainer.appendChild(resultMessage);
-            }
+            };
 
             function deleteTest(materialId) {
                 if (confirm('Вы уверены, что хотите удалить этот материал?')) {
@@ -193,74 +194,74 @@ if (isset($_GET['material_id'])) {
                         }
                     });
                 }
-            }
+            };
 
             function editMaterial(materialId) {
-    // Проверка типа материала
-    var materialContent = '<?php echo addslashes($materialRow['content']); ?>';
+                // Проверка типа материала
+                var materialContent = <?php echo json_encode($materialRow['content'], JSON_HEX_APOS); ?>;
 
-    // Установка значений в модальном окне перед открытием
-    document.getElementById('editMaterialForm').elements.material_id.value = materialId;
-    document.getElementById('editMaterialForm').elements.materialContent.value = materialContent;
+                // Установка значений в модальном окне перед открытием
+                document.getElementById('editMaterialForm').elements.material_id.value = materialId;
+                document.getElementById('editMaterialForm').elements.materialContent.value = materialContent;
 
-    // Открытие модального окна
-    $('#editMaterialModal').modal('show');
-}
+                // Открытие модального окна
+                $('#editMaterialModal').modal('show');
+            };
 
 
 
-$(document).ready(function () {
-        // Обработка формы редактирования
-        $('#editMaterialForm').submit(function (e) {
-            e.preventDefault();
+            $(document).ready(function() {
+                // Обработка формы редактирования
+                $('#editMaterialForm').submit(function(e) {
+                    e.preventDefault();
 
-            var form = $(this);
-            var url = form.attr('action');
-            var formData = form.serialize();
+                    var form = $(this);
+                    var url = form.attr('action');
+                    var formData = form.serialize();
 
-            $.ajax({
-                type: 'POST',
-                url: url,
-                data: formData,
-                success: function (response) {
-                    // Закрываем модальное окно
-                    $('#editMaterialModal').modal('hide');
+                    $.ajax({
+                        type: 'POST',
+                        url: url,
+                        data: formData,
+                        success: function(response) {
+                            // Закрываем модальное окно
+                            $('#editMaterialModal').modal('hide');
 
-                    // Обновляем текст материала на странице
-                    $('#materialContent').text(form.find('textarea[name="materialContent"]').val());
-                },
-                error: function (error) {
-                    console.log('Error:', error);
-                }
+                            // Обновляем текст материала на странице
+                            $('#materialContent').text(form.find('textarea[name="materialContent"]').val());
+                        },
+                        error: function(error) {
+                            console.log('Error:', error);
+                        }
+                    });
+                });
             });
-        });
-    });
 
-    
 
-                function removeMaterial(materialId) {
-                    if (confirm('Вы уверены, что хотите удалить этот материал?')) {
-                        $.ajax({
-                            type: 'POST',
-                            url: './database/delete_material.php',
-                            data: {
-                                material_id: materialId
-                            },
-                            success: function(response) {
-                                var result = JSON.parse(response);
-                                if (result.status === 'success') {
-                                    // Перенаправляем пользователя на страницу с уроками (или иную страницу)
-                                    window.location.href = './lesson_details.php?lesson_id=<?php echo $materialRow['lesson_id']; ?>'; // Замените 'lessons.php' на нужный URL
-                                } else {
-                                    console.error('Ошибка удаления материала: ', result.message);
-                                }
-                            },
-                            error: function(error) {
-                                console.error('Ошибка удаления материала: ', error);
+
+            function removeMaterial(materialId) {
+                if (confirm('Вы уверены, что хотите удалить этот материал?')) {
+                    $.ajax({
+                        type: 'POST',
+                        url: './database/delete_material.php',
+                        data: {
+                            material_id: materialId
+                        },
+                        success: function(response) {
+                            var result = JSON.parse(response);
+                            if (result.status === 'success') {
+                                // Перенаправляем пользователя на страницу с уроками (или иную страницу)
+                                window.location.href = './lesson_details.php?lesson_id=<?php echo $materialRow['lesson_id']; ?>'; // Замените 'lessons.php' на нужный URL
+                            } else {
+                                console.error('Ошибка удаления материала: ', result.message);
                             }
-                        });
-                    }
+                        },
+                        error: function(error) {
+                            console.error('Ошибка удаления материала: ', error);
+                        }
+                    });
                 }
+            }
         </script>
 <?php
     } else {
