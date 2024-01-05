@@ -13,6 +13,7 @@ if (isset($_GET['material_id'])) {
         $materialRow = $materialResult->fetch_assoc();
         $lesson_id = $materialRow['lesson_id'];
 
+
         // Получаем все материалы в уроке, упорядоченные по ID
         $allMaterialsSql = "SELECT * FROM materials WHERE lesson_id = '$lesson_id' ORDER BY id";
         $allMaterialsResult = $conn->query($allMaterialsSql);
@@ -54,6 +55,9 @@ if (isset($_GET['material_id'])) {
                         }
                     } elseif ($materialRow['type'] == 'test') {
                         echo "<h1 class='card-title'>Тестовая задача</h1>";
+
+
+
                         echo "<form id='answerForm'>";
                         echo "<input type='hidden' name='material_id' value='$material_id'>";
                         echo "<p>Вопрос: {$materialRow['question']}</p>";
@@ -116,40 +120,66 @@ if (isset($_GET['material_id'])) {
 
         <script>
             function checkAnswers(materialId) {
-                fetch('../php/database/check_answers.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            material_id: materialId,
-                            selectedAnswers: getSelectedAnswers()
-                        }),
-                    })
-                    .then(response => response.text())
-                    .then(resultText => {
-                        console.log('Result Text:', resultText);
-                        try {
-                            var resultData = JSON.parse(resultText);
-                            if (resultData.result !== undefined) {
-                                if (resultData.result) {
-                                    showResultMessage('Верно!', 'alert-success');
-                                } else {
-                                    showResultMessage('Неверно!', 'alert-danger');
-                                }
-                            } else if (resultData.error !== undefined) {
-                                console.error('Ошибка на сервере:', resultData.error);
-                            } else {
-                                console.error('Неверный формат данных в ответе:', resultText);
-                            }
-                        } catch (error) {
-                            console.error('Ошибка при парсинге JSON:', error);
+    fetch('../php/database/check_answers.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                material_id: materialId,
+                selectedAnswers: getSelectedAnswers()
+            }),
+        })
+        .then(response => response.text())
+        .then(resultText => {
+            console.log('Result Text:', resultText);
+            try {
+                var resultData = JSON.parse(resultText);
+
+                // Вне зависимости от правильности ответа
+                fetch('../php/database/update_progress.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        material_id: materialId,
+                        points: <?php echo $materialRow['points']; ?>,
+                        is_correct: resultData.result !== undefined ? resultData.result : false,
+                        student_id: <?php echo $id; ?>
+                    }),
+                })
+                .then(response => response.text())
+                .then(updateResult => {
+                    // Обработка результата обновления
+                    try {
+                        var updateData = JSON.parse(updateResult);
+                        if (updateData.status === 'success') {
+                            console.log('Баллы успешно начислены!');
+                        } else {
+                            console.error('Ошибка при обновлении баллов:', updateData.message);
                         }
-                    })
-                    .catch(error => {
-                        console.error('Ошибка при обработке ответа:', error);
-                    });
+                    } catch (updateError) {
+                        console.error('Ошибка при парсинге JSON ответа об обновлении баллов:', updateError);
+                        console.log('Содержимое ответа сервера:', updateResult);
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка при обновлении баллов:', error);
+                });
+
+                // Показываем сообщение о результате
+                showResultMessage(resultData.result ? 'Верно!' : 'Неверно!', resultData.result ? 'alert-success' : 'alert-danger');
+                
+            } catch (error) {
+                console.error('Ошибка при парсинге JSON:', error);
             }
+        })
+        .catch(error => {
+            console.error('Ошибка при обработке ответа:', error);
+        });
+}
+
 
 
 
