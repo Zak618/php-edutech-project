@@ -76,7 +76,27 @@ if (isset($_GET['course_id'])) {
         </ul>
     <?php endif; ?>
 </main>
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-body">
+            <?php
+            // Получаем сумму баллов студента за курс
+            $totalPointsSql = "SELECT SUM(points) AS total_points FROM progress WHERE student_id = '$currentUserId' AND material_id IN (SELECT id FROM materials WHERE lesson_id IN (SELECT id FROM lessons WHERE module_id IN (SELECT id FROM modules WHERE course_id = '$courseId')))";
+            $totalPointsResult = $conn->query($totalPointsSql);
+            $totalPointsRow = $totalPointsResult->fetch_assoc();
+            $totalPoints = $totalPointsRow['total_points'];
 
+            // Получаем общее количество баллов доступных за курс
+            $totalPossiblePointsSql = "SELECT SUM(points) AS total_possible_points FROM materials WHERE lesson_id IN (SELECT id FROM lessons WHERE module_id IN (SELECT id FROM modules WHERE course_id = '$courseId'))";
+            $totalPossiblePointsResult = $conn->query($totalPossiblePointsSql);
+            $totalPossiblePointsRow = $totalPossiblePointsResult->fetch_assoc();
+            $totalPossiblePoints = $totalPossiblePointsRow['total_possible_points'];
+
+            echo "<p>Набрано $totalPoints/$totalPossiblePoints баллов за курс.</p>";
+            ?>
+        </div>
+    </div>
+</div>
 <?php
 include_once "./base/footer.php";
 ?>
