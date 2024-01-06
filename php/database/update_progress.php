@@ -15,6 +15,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmtAttempts->bind_param("i", $materialId);
     $stmtAttempts->execute();
 
+    $attemptsLeft = 0; 
+
     $resultAttempts = $stmtAttempts->get_result();
 
     if ($resultAttempts->num_rows > 0) {
@@ -37,7 +39,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$isCorrect) {
                 // Пользователь ответил неверно, уменьшаем число попыток
                 $attemptsLeft--;
-
+                $points = 0;
+                // Обновление записи
+                $updateProgressSql = "UPDATE progress SET attempts_left = ?, points = ? WHERE material_id = ? AND student_id = ?";
+                $stmtUpdate = $conn->prepare($updateProgressSql);
+                $stmtUpdate->bind_param("iiii", $attemptsLeft, $points, $materialId, $studentId);
+                $stmtUpdate->execute();
+                $stmtUpdate->close();
+            } else {
                 // Обновление записи
                 $updateProgressSql = "UPDATE progress SET attempts_left = ?, points = ? WHERE material_id = ? AND student_id = ?";
                 $stmtUpdate = $conn->prepare($updateProgressSql);
@@ -49,24 +58,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Запись не существует
             if (!$isCorrect) {
                 // Пользователь ответил неверно, создаем новую запись
-                $attemptsLeft1 = $maxAttempts - 1;
+                $attemptsLeft = $maxAttempts - 1;
+                $points = 0;
                 $insertProgressSql = "INSERT INTO progress (student_id, material_id, points, attempts_left) VALUES (?, ?, ?, ?)";
                 $stmtInsert = $conn->prepare($insertProgressSql);
-                $stmtInsert->bind_param("iiii", $studentId, $materialId, $points, $attemptsLeft1);
+                $stmtInsert->bind_param("iiii", $studentId, $materialId, $points, $attemptsLeft);
                 $stmtInsert->execute();
                 $stmtInsert->close();
             } elseif ($isCorrect) {
                 // Пользователь ответил верно, создаем новую запись с максимальным количеством попыток
+                $attemptsLeft = $maxAttempts;
                 $insertProgressSql = "INSERT INTO progress (student_id, material_id, points, attempts_left) VALUES (?, ?, ?, ?)";
                 $stmtInsert = $conn->prepare($insertProgressSql);
-                $stmtInsert->bind_param("iiii", $studentId, $materialId, $points, $maxAttempts);
+                $stmtInsert->bind_param("iiii", $studentId, $materialId, $points, $attemptsLeft);
                 $stmtInsert->execute();
                 $stmtInsert->close();
             }
         }
         
         $stmtCheck->close();
-        echo json_encode(['status' => 'success']);
+        echo json_encode(['status' => 'success', 'result' => $isCorrect, 'attempts_left' => $attemptsLeft]);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Attempts not found for the specified material']);
     }

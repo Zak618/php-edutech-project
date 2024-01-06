@@ -71,7 +71,7 @@ if (isset($_GET['material_id'])) {
                             echo "</div>";
                         }
 
-                        echo "<button type='button' class='btn btn-primary mt-3' onclick='checkAnswers(" . $material_id . ")'>Ответить</button>";
+                        echo "<button type='button' id='answerButton' class='btn btn-primary mt-3' onclick='checkAnswers(" . $material_id . ")'>Ответить</button>";
                         if ($role == 2) {
                             echo "<button class='btn btn-danger' onclick='deleteTest(" . $material_id . ")'>Удалить тест</button>";
                         }
@@ -157,6 +157,8 @@ if (isset($_GET['material_id'])) {
                         var updateData = JSON.parse(updateResult);
                         if (updateData.status === 'success') {
                             console.log('Баллы успешно начислены!');
+                            console.log(updateData.attempts_left);
+                            handleAttemptsLeft(updateData.attempts_left);
                         } else {
                             console.error('Ошибка при обновлении баллов:', updateData.message);
                         }
@@ -184,6 +186,23 @@ if (isset($_GET['material_id'])) {
 }
 
 
+function handleAttemptsLeft(attemptsLeft) {
+    if (attemptsLeft == 0) {
+    // Если попытки закончились, блокируем кнопку и отображаем сообщение
+    document.getElementById('answerButton').classList.add('disabled');
+    document.getElementById('answerButton').disabled = true;
+
+    // Показываем сообщение о том, что попытки закончились
+    var attemptsMessage = document.createElement('div');
+    attemptsMessage.className = 'alert alert-danger';
+    attemptsMessage.textContent = 'Все попытки израсходованы. Задание больше не доступно для прохождения.';
+
+    var resultContainer = document.getElementById('resultContainer');
+    resultContainer.innerHTML = '';
+    resultContainer.appendChild(attemptsMessage);
+}
+
+}
 
 
 
