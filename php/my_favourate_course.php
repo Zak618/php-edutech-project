@@ -20,8 +20,8 @@ $enrolledCourses = ($enrolledResult->num_rows > 0) ? $enrolledResult->fetch_all(
 
 ?>
 
-<main>
-    <h2 align="center" style="margin-top: 50px;">Мои курсы</h2>
+<main class="container mt-5">
+    <h2 align="center">Мои курсы</h2>
 
     <?php if ($success == 1): ?>
         <div class="alert alert-success" role="alert">
@@ -29,15 +29,24 @@ $enrolledCourses = ($enrolledResult->num_rows > 0) ? $enrolledResult->fetch_all(
         </div>
     <?php endif; ?>
 
-    <?php if (!empty($enrolledCourses)): ?>
-        <ul>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <?php if (!empty($enrolledCourses)): ?>
             <?php foreach ($enrolledCourses as $enrolledCourse): ?>
-                <li><a href="course_progress.php?course_id=<?php echo $enrolledCourse['id']; ?>" class="btn btn-primary btn-sm"><?php echo $enrolledCourse['title']; ?></a></li>
+                <div class="col">
+                    <div class="card h-100">
+                        <img src="../image/course/image_course.jpg" class="card-img-top" alt="Course Image">
+                        <div class="card-body">
+                            <h5 class="card-title"><?php echo $enrolledCourse['title']; ?></h5>
+                            <p class="card-text"><?php echo $enrolledCourse['description']; ?></p>
+                            <a href="course_progress.php?course_id=<?php echo $enrolledCourse['id']; ?>" class="btn btn-primary">Продолжить</a>
+                        </div>
+                    </div>
+                </div>
             <?php endforeach; ?>
-        </ul>
-    <?php else: ?>
-        <p align="center">У вас нет записей на курсы.</p>
-    <?php endif; ?>
+        <?php else: ?>
+            <p class="text-center mt-3">У вас нет записей на курсы.</p>
+        <?php endif; ?>
+    </div>
 </main>
 
 <?php

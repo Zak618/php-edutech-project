@@ -1,4 +1,15 @@
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<style>
+    /* Стили для навигационной панели */
+.nav-pills .nav-item.active {
+    background-color: #AFDAFC; /* Цвет фона для активного элемента */
+}
+
+.nav-pills .nav-link.active {
+    color: #212529; /* Цвет текста для активного элемента */
+}
+
+</style>
 <?php
 include_once "../../diploma-project/php/base/header.php";
 include_once "../php/database/db.php";
@@ -39,6 +50,60 @@ if (isset($_GET['material_id'])) {
             break;
         }
 ?>
+<!-- Навигационная панель -->
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            Навигация по заданиям
+        </div>
+        <div class="card-body">
+            <ul class="nav nav-pills">
+                <?php
+                foreach ($allMaterials as $index => $navMaterial) {
+                    $navMaterialLink = ($navMaterial['type'] == 'text') ? 'material.php' : 'material.php';
+                    $navMaterialLink .= '?material_id=' . $navMaterial['id'];
+
+                    // Получаем информацию о прогрессе студента для данного материала
+                    $navProgressSql = "SELECT * FROM progress WHERE student_id = '$id' AND material_id = '{$navMaterial['id']}'";
+                    $navProgressResult = $conn->query($navProgressSql);
+
+                    $navItemClass = 'nav-item';
+                    $navLinkClass = 'nav-link';
+
+                    if ($navMaterial['id'] == $material_id) {
+                        // Текущий элемент
+                        $navItemClass .= ' active';
+                        
+                    } elseif ($navProgressResult->num_rows > 0) {
+                        $navProgressRow = $navProgressResult->fetch_assoc();
+                        if ($navProgressRow['points'] > 0) {
+                            // Если студент сдал материал, добавляем зеленую галочку
+                            $navItemClass .= ' bg-success';
+                            $navLinkClass .= ' text-white';
+                        } else {
+                            // Если студент не сдал материал, добавляем красный крестик
+                            $navItemClass .= ' bg-danger';
+                            $navLinkClass .= ' text-white';
+                        }
+                    } else {
+                        // Если материал не пройден, используем цвет по умолчанию
+                        $navItemClass .= ' bg-light';
+                        $navLinkClass .= ' text-dark';
+                    }
+                    ?>
+                    <li class="<?php echo $navItemClass; ?>">
+                        <a class="<?php echo $navLinkClass; ?>" href="<?php echo $navMaterialLink; ?>">
+                            <?php
+                            echo ($navMaterial['type'] == 'text') ? "Текстовая информация" : "Тестовая задача";
+                            ?>
+                        </a>
+                    </li>
+                <?php } ?>
+            </ul>
+        </div>
+    </div>
+</div>
+
 
         <div class="container mt-5">
             <div class="card mb-3">
@@ -110,7 +175,6 @@ if (isset($_GET['material_id'])) {
                         </div>
                     </div>
                 </div>
-            </div>
 
             <div class="mt-3">
                 <?php

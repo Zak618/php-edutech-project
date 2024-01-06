@@ -1,7 +1,7 @@
 <?php
 include_once '../database/db.php'; 
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['material_id'])) {
         $material_id = $_POST['material_id'];
         $deleteSql = "DELETE FROM materials WHERE id = '$material_id'";

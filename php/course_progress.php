@@ -45,37 +45,45 @@ if (isset($_GET['course_id'])) {
 }
 ?>
 
-<main>
-    <h2 align="center" style="margin-top: 50px;"><?php echo $course['title']; ?></h2>
-    <p align="center"><?php echo $course['description']; ?></p>
+<main class="container mt-5">
+    <div class="jumbotron">
+        <h1 class="display-4"><?php echo $course['title']; ?></h1>
+        <p class="lead"><?php echo $course['description']; ?></p>
+    </div>
 
     <!-- Вывод информации о модулях -->
     <?php if (!empty($modules)): ?>
-        <h3>Модули:</h3>
-        <ul>
+        <h3 class="mt-4">Модули:</h3>
+        <div class="list-group">
+            <?php $moduleCounter = 1; ?>
             <?php foreach ($modules as $module): ?>
-                <li><?php echo $module['title']; ?></li>
+                <!-- Используем классы "list-group-item-success" для мятного цвета и "disabled" для невозможности клика -->
+                <a href="#" class="list-group-item list-group-item-action list-group-item-success disabled">
+                    <?php echo $moduleCounter . '. ' . $module['title']; ?>
+                </a>
 
                 <!-- Вывод информации об уроках для каждого модуля -->
                 <?php if (!empty($lessons)): ?>
-                    <ul>
+                    <div class="list-group">
+                        <?php $lessonCounter = 1; ?>
                         <?php foreach ($lessons as $lesson): ?>
                             <?php if ($lesson['module_id'] == $module['id']): ?>
-                                <li>
-                                    <a href="lesson_details.php?lesson_id=<?php echo $lesson['id']; ?>">
-                                        <?php echo $lesson['title']; ?>
-                                    </a>
-
-                                    
-                                </li>
+                                <!-- Используем класс "list-group-item-light" для белого цвета -->
+                                <a href="lesson_details.php?lesson_id=<?php echo $lesson['id']; ?>" class="list-group-item list-group-item-action ml-3 list-group-item-light">
+                                    <?php echo $moduleCounter . '.' . $lessonCounter . '. ' . $lesson['title']; ?>
+                                </a>
+                                <?php $lessonCounter++; ?>
                             <?php endif; ?>
                         <?php endforeach; ?>
-                    </ul>
+                    </div>
                 <?php endif; ?>
+
+                <?php $moduleCounter++; ?>
             <?php endforeach; ?>
-        </ul>
+        </div>
     <?php endif; ?>
 </main>
+
 <div class="container mt-4">
     <div class="card">
         <div class="card-body">
@@ -92,11 +100,20 @@ if (isset($_GET['course_id'])) {
             $totalPossiblePointsRow = $totalPossiblePointsResult->fetch_assoc();
             $totalPossiblePoints = $totalPossiblePointsRow['total_possible_points'];
 
-            echo "<p>Набрано $totalPoints/$totalPossiblePoints баллов за курс.</p>";
+            // Вычисляем процент выполнения курса
+            $progressPercentage = ($totalPoints / $totalPossiblePoints) * 100;
             ?>
+
+            <!-- Добавляем прогресс-бар для визуализации прогресса -->
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: <?php echo $progressPercentage; ?>%;" aria-valuenow="<?php echo $progressPercentage; ?>" aria-valuemin="0" aria-valuemax="100"><?php echo round($progressPercentage, 2); ?>%</div>
+            </div>
+
+            <p class="mt-3">Набрано <?php echo $totalPoints; ?>/<?php echo $totalPossiblePoints; ?> баллов за курс.</p>
         </div>
     </div>
 </div>
+
 <?php
 include_once "./base/footer.php";
 ?>

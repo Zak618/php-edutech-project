@@ -42,24 +42,39 @@ if (isset($_GET['lesson_id'])) {
                     <div class="card mb-3">
                         <div class="card-body">
                             <h4 class="card-title">Материалы урока:</h4>
-                            <ul>
+                            <ol>
                                 <?php while ($materialRow = $materialsResult->fetch_assoc()) { ?>
                                     <li>
                                         <?php
                                         $materialLink = ($materialRow['type'] == 'text') ? 'material.php' : 'material.php';
-
                                         $materialLink .= '?material_id=' . $materialRow['id'];
-                                        ?>
-                                        <a href="<?php echo $materialLink; ?>">
-                                            <?php
-                                            // Отображаем краткую информацию о материале
-                                            echo ($materialRow['type'] == 'text') ? "Текстовая информация" : "Тестовая задача";
-                                            ?>
-                                        </a>
-                                    </li>
-                                <?php } ?>
 
-                            </ul>
+                                        // Получаем информацию о прогрессе студента для данного материала
+                                        $progressSql = "SELECT * FROM progress WHERE student_id = '$id' AND material_id = '{$materialRow['id']}'";
+                                        $progressResult = $conn->query($progressSql);
+
+                                        // Отображаем краткую информацию о материале
+                                        echo '<a href="' . $materialLink . '">';
+                                        echo ($materialRow['type'] == 'text') ? "Текстовая информация" : "Тестовая задача";
+                                        echo '</a>';
+
+                                        if ($progressResult->num_rows > 0) {
+                                            $progressRow = $progressResult->fetch_assoc();
+                                            echo " ";
+
+                                            if ($progressRow['points'] > 0) {
+                                                // Если студент сдал материал, добавляем зеленую галочку
+                                                echo "<span style='color: green;'>✔</span>";
+                                            } else {
+                                                // Если студент не сдал материал, добавляем красный крестик
+                                                echo "<span style='color: red;'>✘</span>";
+                                            }
+                                        }
+                                        ?>
+                                    </li>
+
+                                <?php } ?>
+                            </ol>
                         </div>
                     </div>
                 <?php } else { ?>
@@ -70,10 +85,12 @@ if (isset($_GET['lesson_id'])) {
                     </div>
                 <?php } ?>
 
-                <div class="mt-3">
-                    <!-- Кнопка для добавления материала -->
-                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMaterialModal">Добавить материал</button>
-                </div>
+                <?php if ($userRole == $creatorRole) { ?>
+                    <div class="mt-3">
+                        <!-- Кнопка для добавления материала -->
+                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMaterialModal">Добавить материал</button>
+                    </div>
+                <?php } ?>
                 <!-- Модальное окно для добавления материала -->
                 <div class="modal fade" id="addMaterialModal" tabindex="-1" aria-labelledby="addMaterialModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
@@ -125,7 +142,7 @@ if (isset($_GET['lesson_id'])) {
 
                                     </div>
 
-                                    <button type='submit' class='btn btn-primary'>Добавить материал</button>
+                                    <!-- <button type='submit' class='btn btn-primary'>Добавить материал</button> -->
                                 </form>
                             </div>
                         </div>
