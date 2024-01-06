@@ -39,9 +39,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $attemptsLeft--;
 
                 // Обновление записи
-                $updateProgressSql = "UPDATE progress SET attempts_left = ? WHERE material_id = ? AND student_id = ?";
+                $updateProgressSql = "UPDATE progress SET attempts_left = ?, points = ? WHERE material_id = ? AND student_id = ?";
                 $stmtUpdate = $conn->prepare($updateProgressSql);
-                $stmtUpdate->bind_param("iii", $attemptsLeft, $materialId, $studentId);
+                $stmtUpdate->bind_param("iiii", $attemptsLeft, $points, $materialId, $studentId);
                 $stmtUpdate->execute();
                 $stmtUpdate->close();
             }
@@ -50,22 +50,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$isCorrect) {
                 // Пользователь ответил неверно, создаем новую запись
                 $attemptsLeft1 = $maxAttempts - 1;
-                $insertProgressSql = "INSERT INTO progress (student_id, material_id, attempts_left) VALUES (?, ?, ?)";
+                $insertProgressSql = "INSERT INTO progress (student_id, material_id, points, attempts_left) VALUES (?, ?, ?, ?)";
                 $stmtInsert = $conn->prepare($insertProgressSql);
-                $stmtInsert->bind_param("iii", $studentId, $materialId, $attemptsLeft1);
+                $stmtInsert->bind_param("iiii", $studentId, $materialId, $points, $attemptsLeft1);
                 $stmtInsert->execute();
                 $stmtInsert->close();
             } elseif ($isCorrect) {
                 // Пользователь ответил верно, создаем новую запись с максимальным количеством попыток
-                $insertProgressSql = "INSERT INTO progress (student_id, material_id, attempts_left) VALUES (?, ?, ?)";
+                $insertProgressSql = "INSERT INTO progress (student_id, material_id, points, attempts_left) VALUES (?, ?, ?, ?)";
                 $stmtInsert = $conn->prepare($insertProgressSql);
-                $stmtInsert->bind_param("iii", $studentId, $materialId, $maxAttempts);
+                $stmtInsert->bind_param("iiii", $studentId, $materialId, $points, $maxAttempts);
                 $stmtInsert->execute();
                 $stmtInsert->close();
             }
         }
-
+        
         $stmtCheck->close();
+        echo json_encode(['status' => 'success']);
     } else {
         echo json_encode(['status' => 'error', 'message' => 'Attempts not found for the specified material']);
     }

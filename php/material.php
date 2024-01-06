@@ -133,6 +133,7 @@ if (isset($_GET['material_id'])) {
         .then(response => response.text())
         .then(resultText => {
             console.log('Result Text:', resultText);
+            console.log('Содержимое ответа сервера перед парсингом:', resultText);
             try {
                 var resultData = JSON.parse(resultText);
 
@@ -173,6 +174,8 @@ if (isset($_GET['material_id'])) {
                 
             } catch (error) {
                 console.error('Ошибка при парсинге JSON:', error);
+                console.error('Ошибка при парсинге JSON:', error);
+                console.log('Содержимое ответа сервера:', resultText);
             }
         })
         .catch(error => {
