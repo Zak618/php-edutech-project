@@ -67,7 +67,7 @@ if (isset($_SESSION['role'])) {
 
                     </ul>
                     <form class="d-flex" role="search">
-                        <input class="form-control me-2" type="search" placeholder="Найти курс" aria-label="Search">
+                        <input class="form-control me-2" type="search" placeholder="Найти курс" aria-label="Search" >
                         <button class="btn btn-outline-success" type="submit">Поиск</button>
                         <?php if ($role == 1 || $role == 2) { ?>
                             <div class="dropdown">

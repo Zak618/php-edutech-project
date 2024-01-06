@@ -32,7 +32,7 @@ $enrolledCourses = ($enrolledResult->num_rows > 0) ? $enrolledResult->fetch_all(
     <?php if (!empty($enrolledCourses)): ?>
         <ul>
             <?php foreach ($enrolledCourses as $enrolledCourse): ?>
-                <li><?php echo $enrolledCourse['title']; ?></li>
+                <li><a href="course_progress.php?course_id=<?php echo $enrolledCourse['id']; ?>" class="btn btn-primary btn-sm"><?php echo $enrolledCourse['title']; ?></a></li>
             <?php endforeach; ?>
         </ul>
     <?php else: ?>
