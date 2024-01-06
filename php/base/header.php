@@ -15,9 +15,10 @@ if (isset($_SESSION['role'])) {
     if ($role == 2) {
         $teacher_id = $id;
     }
-    function logout() {
+    function logout()
+    {
         session_destroy();
-        
+
         header("Location: ../../../diploma-project/php/start.php");
         exit;
     }
@@ -66,9 +67,12 @@ if (isset($_SESSION['role'])) {
                         <?php } ?>
 
                     </ul>
-                    <form class="d-flex" role="search">
-                        <input class="form-control me-2" type="search" placeholder="Найти курс" aria-label="Search" >
-                        <button class="btn btn-outline-success" type="submit">Поиск</button>
+                    
+                        <form class="d-flex" role="search" method="GET" action="../php/search_results.php">
+                            <input class="form-control me-2" type="search" placeholder="Найти курс" aria-label="Search" name="search">
+                            <button class="btn btn-outline-success" type="submit">Поиск</button>
+                        </form>
+                        <form class="d-flex" role="search">
                         <?php if ($role == 1 || $role == 2) { ?>
                             <div class="dropdown">
                                 <a class="btn btn-outline-success dropdown-toggle" role="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="margin-left: 5px;">
