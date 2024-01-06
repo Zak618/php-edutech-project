@@ -60,6 +60,12 @@ if (isset($_GET['material_id'])) {
 
                         echo "<form id='answerForm'>";
                         echo "<input type='hidden' name='material_id' value='$material_id'>";
+
+                        echo "<div class='mt-3'>";
+                        echo "<p id='totalScore'></p>";
+                        echo "<p id='attemptsLeft'></p>";
+                        echo "</div>";
+
                         echo "<p>Вопрос: {$materialRow['question']}</p>";
 
                         $options = explode(",", $materialRow['options']);
@@ -158,7 +164,7 @@ if (isset($_GET['material_id'])) {
                         if (updateData.status === 'success') {
                             console.log('Баллы успешно начислены!');
                             console.log(updateData.attempts_left);
-                            handleAttemptsLeft(updateData.attempts_left);
+                            handleAttemptsLeft(updateData.attempts_left, resultData.result);
                         } else {
                             console.error('Ошибка при обновлении баллов:', updateData.message);
                         }
@@ -186,7 +192,14 @@ if (isset($_GET['material_id'])) {
 }
 
 
-function handleAttemptsLeft(attemptsLeft) {
+function handleAttemptsLeft(attemptsLeft, isCorrect) {
+    var totalScoreContainer = document.getElementById('totalScore');
+    var attemptsLeftContainer = document.getElementById('attemptsLeft');
+
+    totalScoreContainer.textContent = 'Вы набрали ' + (isCorrect ? <?php echo $materialRow['points']; ?> : 0) + ' баллов';
+    attemptsLeftContainer.textContent = 'У вас осталось ' + attemptsLeft + '/' + <?php echo $materialRow['attempts']; ?> + ' попыток';
+
+
     if (attemptsLeft == 0) {
     // Если попытки закончились, блокируем кнопку и отображаем сообщение
     document.getElementById('answerButton').classList.add('disabled');
