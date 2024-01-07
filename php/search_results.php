@@ -20,8 +20,8 @@ $currentUserId = $id; // Замените на ваш вариант
 
 ?>
 
-<main>
-    <h2 align="center" style="margin-top: 50px;">Результаты поиска</h2>
+<main class="container mt-5">
+    <h2 class="text-center mb-4">Результаты поиска</h2>
 
     <?php if (!empty($searchCourses)): ?>
         <div class="row row-cols-1 row-cols-md-3 g-4">
@@ -65,7 +65,7 @@ $currentUserId = $id; // Замените на ваш вариант
             <?php endforeach; ?>
         </div>
     <?php else: ?>
-        <p align="center">Ничего не найдено.</p>
+        <p class="text-center">Ничего не найдено.</p>
     <?php endif; ?>
 </main>
 

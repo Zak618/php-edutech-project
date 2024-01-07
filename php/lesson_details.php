@@ -119,30 +119,33 @@ if (isset($_GET['lesson_id'])) {
                                     </div>
 
                                     <div class="mb-3" id="testMaterialFields" style="display: none;">
+
                                         <!-- Поля для тестовой задачи -->
                                         <label for="testMaterialQuestion" class="form-label">Вопрос:</label>
                                         <input type="text" class="form-control" name="testMaterialQuestion">
-                                        <label for="testMaterialPoints" class="form-label">Количество баллов:</label>
+
+                                        <label for="testMaterialPoints" class="form-label mt-3">Количество баллов:</label>
                                         <input type="number" class="form-control" name="testMaterialPoints" value="0" min="0">
 
-                                        <label for="testMaterialAttempts" class="form-label">Количество попыток (необязательно):</label>
+                                        <label for="testMaterialAttempts" class="form-label mt-3">Количество попыток (необязательно):</label>
                                         <input type="number" class="form-control" name="testMaterialAttempts" min="1" max="10">
 
-                                        <label for="testMaterialOptions" class="form-label">Варианты ответов:</label>
-                                        <div id="checkboxContainer">
+                                        <label for="testMaterialOptions" class="form-label mt-3">Варианты ответов:</label>
+                                        <div id="checkboxContainer" class="mb-3">
                                             <!-- Здесь будут отображаться чекбоксы -->
                                         </div>
                                         <button type="button" class="btn btn-success" onclick="addCheckbox()">Добавить вариант ответа</button>
-                                        <button type="button" class="btn btn-danger" onclick="removeCheckbox()">Удалить последний вариант ответа</button>
-
-                                        <label for="testMaterialCorrectAnswers" class="form-label">Верные ответы:</label>
-                                        <div id="correctCheckboxContainer">
+                                        <button type="button" class="btn btn-danger mt-3" onclick="removeCheckbox()">Удалить последний вариант ответа</button>
+                                        <br>
+                                        <label for="testMaterialCorrectAnswers" class="form-label mt-3">Верные ответы:</label>
+                                        <div id="correctCheckboxContainer" class="mb-3">
                                             <!-- Здесь будут отображаться чекбоксы для выбора верных ответов -->
                                         </div>
 
                                     </div>
 
-                                    <!-- <button type='submit' class='btn btn-primary'>Добавить материал</button> -->
+
+                                    <button type='submit' class='btn btn-primary'>Добавить материал</button>
                                 </form>
                             </div>
                         </div>
@@ -169,12 +172,13 @@ if (isset($_GET['lesson_id'])) {
                         var checkboxContainer = document.getElementById('checkboxContainer');
                         var newCheckbox = document.createElement('div');
                         var index = checkboxContainer.children.length + 1;
-                        newCheckbox.innerHTML = '<input type="text" class="form-control" name="testMaterialOptions[]" placeholder="Вариант ответа ' + index + '">';
+                        newCheckbox.innerHTML = '<input type="text" class="form-control" name="testMaterialOptions[]' + index + '" placeholder="Вариант ответа ' + index + '">';
                         checkboxContainer.appendChild(newCheckbox);
 
                         // Добавляем чекбокс для выбора верного ответа
                         addCorrectCheckbox(index);
                     }
+
 
                     // Функция для удаления последнего чекбокса
                     function removeCheckbox() {
@@ -191,10 +195,24 @@ if (isset($_GET['lesson_id'])) {
                     // Функция для добавления чекбокса для выбора верного ответа
                     function addCorrectCheckbox(index) {
                         var correctCheckboxContainer = document.getElementById('correctCheckboxContainer');
-                        var newCheckbox = document.createElement('div');
-                        newCheckbox.innerHTML = '<input type="checkbox" name="correctAnswers[]" value="' + index + '"> Вариант ' + index;
-                        correctCheckboxContainer.appendChild(newCheckbox);
+                        var newCheckboxDiv = document.createElement('div');
+                        newCheckboxDiv.classList.add('form-check', 'mb-2');
+
+                        var newCheckbox = document.createElement('input');
+                        newCheckbox.type = 'checkbox';
+                        newCheckbox.name = 'correctAnswers[]';
+                        newCheckbox.value = index;
+                        newCheckbox.classList.add('form-check-input');
+
+                        var label = document.createElement('label');
+                        label.classList.add('form-check-label');
+                        label.textContent = 'Вариант ' + index;
+
+                        newCheckboxDiv.appendChild(newCheckbox);
+                        newCheckboxDiv.appendChild(label);
+                        correctCheckboxContainer.appendChild(newCheckboxDiv);
                     }
+
 
 
                     document.getElementById('materialType').addEventListener('change', toggleMaterialFields);

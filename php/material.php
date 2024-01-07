@@ -142,8 +142,9 @@ if (isset($_GET['material_id'])) {
                             echo "<label class='form-check-label' for='option$index'>$option</label>";
                             echo "</div>";
                         }
-
-                        echo "<button type='button' id='answerButton' class='btn btn-primary mt-3' onclick='checkAnswers(" . $material_id . ")'>Ответить</button>";
+                        ?>
+                        <button type='button' id='answerButton' class='btn btn-primary' style='margin-right: 10px;' onclick='checkAnswers("<?php echo $material_id; ?>")'>Ответить</button>
+                        <?php
                         if ($role == 2) {
                             echo "<button class='btn btn-danger' onclick='deleteTest(" . $material_id . ")'>Удалить тест</button>";
                         }
@@ -262,8 +263,8 @@ if (isset($_GET['material_id'])) {
                 var totalScoreContainer = document.getElementById('totalScore');
                 var attemptsLeftContainer = document.getElementById('attemptsLeft');
 
-                totalScoreContainer.textContent = 'Вы набрали ' + (isCorrect ? '<?php echo $materialRow['points']; ?>' : 0) + ' баллов';
-                attemptsLeftContainer.textContent = 'У вас осталось ' + attemptsLeft + '/' + <?php echo $materialRow['attempts']; ?> + ' попыток';
+                totalScoreContainer.textContent = 'Вы набрали ' + (isCorrect ? <?php echo json_encode($materialRow['points']); ?> : 0) + ' баллов';
+                attemptsLeftContainer.textContent = 'У вас осталось ' + attemptsLeft + '/' + <?php echo json_encode($materialRow['attempts']); ?> + ' попыток';
 
 
                 if (attemptsLeft == 0) {
@@ -329,7 +330,8 @@ if (isset($_GET['material_id'])) {
 
             function editMaterial(materialId) {
                 // Проверка типа материала
-                var materialContent = '<?php echo addslashes($materialRow['content']); ?>';
+                var materialContent = <?php echo json_encode($materialRow['content']); ?>;
+
 
                 // Установка значений в модальном окне перед открытием
                 document.getElementById('editMaterialForm').elements.material_id.value = materialId;
@@ -382,7 +384,7 @@ if (isset($_GET['material_id'])) {
                             var result = JSON.parse(response);
                             if (result.status === 'success') {
                                 // Перенаправляем пользователя на страницу с уроками (или иную страницу)
-                                window.location.href = './lesson_details.php?lesson_id=<?php echo $materialRow['lesson_id']; ?>'; // Замените 'lessons.php' на нужный URL
+                                window.location.href = './lesson_details.php?lesson_id=<?php echo urlencode($materialRow['lesson_id']); ?>';
                             } else {
                                 console.error('Ошибка удаления материала: ', result.message);
                             }
