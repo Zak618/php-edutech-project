@@ -1,14 +1,15 @@
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <style>
     /* Стили для навигационной панели */
-.nav-pills .nav-item.active {
-    background-color: #AFDAFC; /* Цвет фона для активного элемента */
-}
+    .nav-pills .nav-item.active {
+        background-color: #AFDAFC;
+        /* Цвет фона для активного элемента */
+    }
 
-.nav-pills .nav-link.active {
-    color: #212529; /* Цвет текста для активного элемента */
-}
-
+    .nav-pills .nav-link.active {
+        color: #212529;
+        /* Цвет текста для активного элемента */
+    }
 </style>
 <?php
 include_once "../../diploma-project/php/base/header.php";
@@ -50,59 +51,58 @@ if (isset($_GET['material_id'])) {
             break;
         }
 ?>
-<!-- Навигационная панель -->
-<div class="container mt-4">
-    <div class="card">
-        <div class="card-header bg-primary text-white">
-            Навигация по заданиям
+        <!-- Навигационная панель -->
+        <div class="container mt-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    Навигация по заданиям
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-pills">
+                        <?php
+                        foreach ($allMaterials as $index => $navMaterial) {
+                            $navMaterialLink = ($navMaterial['type'] == 'text') ? 'material.php' : 'material.php';
+                            $navMaterialLink .= '?material_id=' . $navMaterial['id'];
+
+                            // Получаем информацию о прогрессе студента для данного материала
+                            $navProgressSql = "SELECT * FROM progress WHERE student_id = '$id' AND material_id = '{$navMaterial['id']}'";
+                            $navProgressResult = $conn->query($navProgressSql);
+
+                            $navItemClass = 'nav-item';
+                            $navLinkClass = 'nav-link';
+
+                            if ($navMaterial['id'] == $material_id) {
+                                // Текущий элемент
+                                $navItemClass .= ' active';
+                            } elseif ($navProgressResult->num_rows > 0) {
+                                $navProgressRow = $navProgressResult->fetch_assoc();
+                                if ($navProgressRow['points'] > 0) {
+                                    // Если студент сдал материал, добавляем зеленую галочку
+                                    $navItemClass .= ' bg-success';
+                                    $navLinkClass .= ' text-white';
+                                } else {
+                                    // Если студент не сдал материал, добавляем красный крестик
+                                    $navItemClass .= ' bg-danger';
+                                    $navLinkClass .= ' text-white';
+                                }
+                            } else {
+                                // Если материал не пройден, используем цвет по умолчанию
+                                $navItemClass .= ' bg-light';
+                                $navLinkClass .= ' text-dark';
+                            }
+                        ?>
+                            <li class="<?php echo $navItemClass; ?>">
+                                <a class="<?php echo $navLinkClass; ?>" href="<?php echo $navMaterialLink; ?>">
+                                    <?php
+                                    echo ($navMaterial['type'] == 'text') ? "Текстовая информация" : "Тестовая задача";
+                                    ?>
+                                </a>
+                            </li>
+                        <?php } ?>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-            <ul class="nav nav-pills">
-                <?php
-                foreach ($allMaterials as $index => $navMaterial) {
-                    $navMaterialLink = ($navMaterial['type'] == 'text') ? 'material.php' : 'material.php';
-                    $navMaterialLink .= '?material_id=' . $navMaterial['id'];
-
-                    // Получаем информацию о прогрессе студента для данного материала
-                    $navProgressSql = "SELECT * FROM progress WHERE student_id = '$id' AND material_id = '{$navMaterial['id']}'";
-                    $navProgressResult = $conn->query($navProgressSql);
-
-                    $navItemClass = 'nav-item';
-                    $navLinkClass = 'nav-link';
-
-                    if ($navMaterial['id'] == $material_id) {
-                        // Текущий элемент
-                        $navItemClass .= ' active';
-                        
-                    } elseif ($navProgressResult->num_rows > 0) {
-                        $navProgressRow = $navProgressResult->fetch_assoc();
-                        if ($navProgressRow['points'] > 0) {
-                            // Если студент сдал материал, добавляем зеленую галочку
-                            $navItemClass .= ' bg-success';
-                            $navLinkClass .= ' text-white';
-                        } else {
-                            // Если студент не сдал материал, добавляем красный крестик
-                            $navItemClass .= ' bg-danger';
-                            $navLinkClass .= ' text-white';
-                        }
-                    } else {
-                        // Если материал не пройден, используем цвет по умолчанию
-                        $navItemClass .= ' bg-light';
-                        $navLinkClass .= ' text-dark';
-                    }
-                    ?>
-                    <li class="<?php echo $navItemClass; ?>">
-                        <a class="<?php echo $navLinkClass; ?>" href="<?php echo $navMaterialLink; ?>">
-                            <?php
-                            echo ($navMaterial['type'] == 'text') ? "Текстовая информация" : "Тестовая задача";
-                            ?>
-                        </a>
-                    </li>
-                <?php } ?>
-            </ul>
-        </div>
-    </div>
-</div>
 
 
         <div class="container mt-5">
@@ -112,12 +112,13 @@ if (isset($_GET['material_id'])) {
                     if ($materialRow['type'] == 'text') {
                         echo "<h1 class='card-title'>Текстовая информация</h1>";
                         echo "<p>{$materialRow['content']}</p>";
-                        if ($role == 2 && $materialRow['type'] == 'text') {
-                            echo "<div class=\"mb-3\">";
-                            echo "<button class=\"btn btn-primary\" onclick=\"editMaterial(" . $materialRow['id'] . ")\">Редактировать</button>";
-                            echo "<button class=\"btn btn-danger\" onclick=\"removeMaterial(" . $materialRow['id'] . ")\">Удалить материал</button>";
-                            echo "</div>";
-                        }
+                        if ($role == 2 && $materialRow['type'] == 'text') { ?>
+                            <div class="mb-3">
+                                <button class="btn btn-primary" onclick="editMaterial(<?php echo $materialRow['id']; ?>)">Редактировать</button>
+                                <!-- Кнопка для удаления материала -->
+                                <button class="btn btn-danger" onclick="removeMaterial(<?php echo $materialRow['id']; ?>)">Удалить материал</button>
+                            </div>
+                    <?php }
                     } elseif ($materialRow['type'] == 'test') {
                         echo "<h1 class='card-title'>Тестовая задача</h1>";
 
@@ -162,7 +163,7 @@ if (isset($_GET['material_id'])) {
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title" id="editMaterialModalLabel">Редактировать текстовый материал</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">Сохранить изменения</button>
                         </div>
                         <div class="modal-body">
                             <!-- Форма для редактирования текстового материала -->
@@ -175,6 +176,7 @@ if (isset($_GET['material_id'])) {
                         </div>
                     </div>
                 </div>
+            </div>
 
             <div class="mt-3">
                 <?php
@@ -190,96 +192,96 @@ if (isset($_GET['material_id'])) {
 
         <script>
             function checkAnswers(materialId) {
-    fetch('../php/database/check_answers.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                material_id: materialId,
-                selectedAnswers: getSelectedAnswers()
-            }),
-        })
-        .then(response => response.text())
-        .then(resultText => {
-            console.log('Result Text:', resultText);
-            console.log('Содержимое ответа сервера перед парсингом:', resultText);
-            try {
-                var resultData = JSON.parse(resultText);
+                fetch('../php/database/check_answers.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            material_id: materialId,
+                            selectedAnswers: getSelectedAnswers()
+                        }),
+                    })
+                    .then(response => response.text())
+                    .then(resultText => {
+                        console.log('Result Text:', resultText);
+                        console.log('Содержимое ответа сервера перед парсингом:', resultText);
+                        try {
+                            var resultData = JSON.parse(resultText);
 
-                // Вне зависимости от правильности ответа
-                fetch('../php/database/update_progress.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        material_id: materialId,
-                        points: <?php echo $materialRow['points']; ?>,
-                        is_correct: resultData.result !== undefined ? resultData.result : false,
-                        student_id: <?php echo $id; ?>
-                    }),
-                })
-                .then(response => response.text())
-                .then(updateResult => {
-                    // Обработка результата обновления
-                    try {
-                        var updateData = JSON.parse(updateResult);
-                        if (updateData.status === 'success') {
-                            console.log('Баллы успешно начислены!');
-                            console.log(updateData.attempts_left);
-                            handleAttemptsLeft(updateData.attempts_left, resultData.result);
-                        } else {
-                            console.error('Ошибка при обновлении баллов:', updateData.message);
+                            // Вне зависимости от правильности ответа
+                            fetch('../php/database/update_progress.php', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({
+                                        material_id: materialId,
+                                        points: '<?php echo $materialRow['points']; ?>',
+                                        is_correct: resultData.result !== undefined ? resultData.result : false,
+                                        student_id: '<?php echo $id; ?>'
+                                    }),
+                                })
+                                .then(response => response.text())
+                                .then(updateResult => {
+                                    // Обработка результата обновления
+                                    try {
+                                        var updateData = JSON.parse(updateResult);
+                                        if (updateData.status === 'success') {
+                                            console.log('Баллы успешно начислены!');
+                                            console.log(updateData.attempts_left);
+                                            handleAttemptsLeft(updateData.attempts_left, resultData.result);
+                                        } else {
+                                            console.error('Ошибка при обновлении баллов:', updateData.message);
+                                        }
+                                    } catch (updateError) {
+                                        console.error('Ошибка при парсинге JSON ответа об обновлении баллов:', updateError);
+                                        console.log('Содержимое ответа сервера:', updateResult);
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Ошибка при обновлении баллов:', error);
+                                });
+
+                            // Показываем сообщение о результате
+                            showResultMessage(resultData.result ? 'Верно!' : 'Неверно!', resultData.result ? 'alert-success' : 'alert-danger');
+
+                        } catch (error) {
+                            console.error('Ошибка при парсинге JSON:', error);
+                            console.error('Ошибка при парсинге JSON:', error);
+                            console.log('Содержимое ответа сервера:', resultText);
                         }
-                    } catch (updateError) {
-                        console.error('Ошибка при парсинге JSON ответа об обновлении баллов:', updateError);
-                        console.log('Содержимое ответа сервера:', updateResult);
-                    }
-                })
-                .catch(error => {
-                    console.error('Ошибка при обновлении баллов:', error);
-                });
-
-                // Показываем сообщение о результате
-                showResultMessage(resultData.result ? 'Верно!' : 'Неверно!', resultData.result ? 'alert-success' : 'alert-danger');
-                
-            } catch (error) {
-                console.error('Ошибка при парсинге JSON:', error);
-                console.error('Ошибка при парсинге JSON:', error);
-                console.log('Содержимое ответа сервера:', resultText);
+                    })
+                    .catch(error => {
+                        console.error('Ошибка при обработке ответа:', error);
+                    });
             }
-        })
-        .catch(error => {
-            console.error('Ошибка при обработке ответа:', error);
-        });
-}
 
 
-function handleAttemptsLeft(attemptsLeft, isCorrect) {
-    var totalScoreContainer = document.getElementById('totalScore');
-    var attemptsLeftContainer = document.getElementById('attemptsLeft');
+            function handleAttemptsLeft(attemptsLeft, isCorrect) {
+                var totalScoreContainer = document.getElementById('totalScore');
+                var attemptsLeftContainer = document.getElementById('attemptsLeft');
 
-    totalScoreContainer.textContent = 'Вы набрали ' + (isCorrect ? <?php echo $materialRow['points']; ?> : 0) + ' баллов';
-    attemptsLeftContainer.textContent = 'У вас осталось ' + attemptsLeft + '/' + <?php echo $materialRow['attempts']; ?> + ' попыток';
+                totalScoreContainer.textContent = 'Вы набрали ' + (isCorrect ? '<?php echo $materialRow['points']; ?>' : 0) + ' баллов';
+                attemptsLeftContainer.textContent = 'У вас осталось ' + attemptsLeft + '/' + <?php echo $materialRow['attempts']; ?> + ' попыток';
 
 
-    if (attemptsLeft == 0) {
-    // Если попытки закончились, блокируем кнопку и отображаем сообщение
-    document.getElementById('answerButton').classList.add('disabled');
-    document.getElementById('answerButton').disabled = true;
+                if (attemptsLeft == 0) {
+                    // Если попытки закончились, блокируем кнопку и отображаем сообщение
+                    document.getElementById('answerButton').classList.add('disabled');
+                    document.getElementById('answerButton').disabled = true;
 
-    // Показываем сообщение о том, что попытки закончились
-    var attemptsMessage = document.createElement('div');
-    attemptsMessage.className = 'alert alert-danger';
-    attemptsMessage.textContent = 'Все попытки израсходованы. Задание больше не доступно для прохождения.';
+                    // Показываем сообщение о том, что попытки закончились
+                    var attemptsMessage = document.createElement('div');
+                    attemptsMessage.className = 'alert alert-danger';
+                    attemptsMessage.textContent = 'Все попытки израсходованы. Задание больше не доступно для прохождения.';
 
-    var resultContainer = document.getElementById('resultContainer');
-    resultContainer.innerHTML = '';
-    resultContainer.appendChild(attemptsMessage);
-}
+                    var resultContainer = document.getElementById('resultContainer');
+                    resultContainer.innerHTML = '';
+                    resultContainer.appendChild(attemptsMessage);
+                }
 
-}
+            }
 
 
 
@@ -327,7 +329,7 @@ function handleAttemptsLeft(attemptsLeft, isCorrect) {
 
             function editMaterial(materialId) {
                 // Проверка типа материала
-                var materialContent = <?php echo json_encode($materialRow['content'], JSON_HEX_APOS); ?>;
+                var materialContent = '<?php echo addslashes($materialRow['content']); ?>';
 
                 // Установка значений в модальном окне перед открытием
                 document.getElementById('editMaterialForm').elements.material_id.value = materialId;
