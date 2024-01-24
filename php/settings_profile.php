@@ -21,12 +21,61 @@ include_once "./base/header.php";
       <input type="email" class="form-control" id="inputEmail3" value="<?php echo $email ?>" name="email">
     </div>
   </div>
-  <div class="row mb-3">
+  <style>
+    .password-container {
+        position: relative;
+    }
+
+    .password-input {
+        padding-right: 30px;
+    }
+
+    .eye-icon {
+        position: absolute;
+        top: 50%;
+        right: -460px;
+        transform: translateY(-50%);
+        cursor: pointer;
+        opacity: 0.7;
+        transition: opacity 0.9s ease-in-out;
+    }
+
+    .eye-icon:hover {
+        opacity: 1;
+    }
+
+    .smiley {
+        display: inline-block;
+        animation: bounce 0.9s infinite alternate;
+    }
+
+    @keyframes bounce {
+        to {
+            transform: translateY(-5px);
+        }
+    }
+</style>
+
+<div class="row mb-3">
     <label for="inputPassword3" class="col-sm-2 col-form-label">Password</label>
-    <div class="col-sm-10">
-      <input type="text" class="form-control" id="inputPassword3" value="<?php echo $password ?>" name="password">
+    <div class="col-sm-10 password-container">
+        <input type="password" class="form-control password-input" id="inputPassword3" value="<?php echo $password ?>" name="password">
+        <span class="eye-icon" onclick="togglePassword()"><span class="smiley"><img src="../image/profile/free-icon-close-eyes-11516530.png" width="5%"></span></span>
     </div>
-  </div>
+</div>
+
+<script>
+    function togglePassword() {
+        var passwordInput = document.getElementById("inputPassword3");
+
+        if (passwordInput.type === "password") {
+            passwordInput.type = "text";
+        } else {
+            passwordInput.type = "password";
+        }
+    }
+</script>
+
   <div class="row mb-3">
     <label for="inputImage" class="col-sm-2 col-form-label">Фото профиля</label>
     <div class="col-sm-10">
