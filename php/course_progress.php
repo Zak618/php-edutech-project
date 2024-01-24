@@ -52,22 +52,22 @@ if (isset($_GET['course_id'])) {
     </div>
 
     <!-- Вывод информации о модулях -->
-    <?php if (!empty($modules)): ?>
+    <?php if (!empty($modules)) : ?>
         <h3 class="mt-4">Модули:</h3>
         <div class="list-group">
             <?php $moduleCounter = 1; ?>
-            <?php foreach ($modules as $module): ?>
+            <?php foreach ($modules as $module) : ?>
                 <!-- Используем классы "list-group-item-success" для мятного цвета и "disabled" для невозможности клика -->
                 <a href="#" class="list-group-item list-group-item-action list-group-item-success disabled">
                     <?php echo $moduleCounter . '. ' . $module['title']; ?>
                 </a>
 
                 <!-- Вывод информации об уроках для каждого модуля -->
-                <?php if (!empty($lessons)): ?>
+                <?php if (!empty($lessons)) : ?>
                     <div class="list-group">
                         <?php $lessonCounter = 1; ?>
-                        <?php foreach ($lessons as $lesson): ?>
-                            <?php if ($lesson['module_id'] == $module['id']): ?>
+                        <?php foreach ($lessons as $lesson) : ?>
+                            <?php if ($lesson['module_id'] == $module['id']) : ?>
                                 <!-- Используем класс "list-group-item-light" для белого цвета -->
                                 <a href="lesson_details.php?lesson_id=<?php echo $lesson['id']; ?>" class="list-group-item list-group-item-action ml-3 list-group-item-light">
                                     <?php echo $moduleCounter . '.' . $lessonCounter . '. ' . $lesson['title']; ?>
@@ -100,8 +100,22 @@ if (isset($_GET['course_id'])) {
             $totalPossiblePointsRow = $totalPossiblePointsResult->fetch_assoc();
             $totalPossiblePoints = $totalPossiblePointsRow['total_possible_points'];
 
-            // Вычисляем процент выполнения курса
-            $progressPercentage = ($totalPoints / $totalPossiblePoints) * 100;
+            // Проверяем, чтобы не делить на ноль
+            if ($totalPossiblePoints > 0) {
+                // Вычисляем процент выполнения курса
+                $progressPercentage = ($totalPoints / $totalPossiblePoints) * 100;
+            } else {
+                // Если общее количество баллов равно нулю, устанавливаем процент выполнения в ноль
+                $progressPercentage = 0;
+            }
+            // Проверяем условия для отображения кнопок
+            $certificateButton = "";
+            if ($progressPercentage >= 80) {
+                $certificateButton = '<a href="generate_certificate.php?course_id=' . $courseId . '" class="btn btn-primary">Получить сертификат</a>';
+            }
+
+
+
             ?>
 
             <!-- Добавляем прогресс-бар для визуализации прогресса -->
@@ -110,6 +124,10 @@ if (isset($_GET['course_id'])) {
             </div>
 
             <p class="mt-3">Набрано <?php echo $totalPoints; ?>/<?php echo $totalPossiblePoints; ?> баллов за курс.</p>
+
+            <div class="mt-3">
+                <?php echo $certificateButton; ?>
+            </div>
         </div>
     </div>
 </div>

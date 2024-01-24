@@ -41,7 +41,7 @@ if (isset($_GET['course_id'])) {
         $enrolledResult = $conn->query($enrolledSql);
         $isEnrolled = ($enrolledResult->num_rows > 0);
 
-        // Пример обработчика для кнопки "Записаться на курс"
+
         if (isset($_POST['enroll_course'])) {
             // Проверяем, что студент не записан на курс
             if (!$isEnrolled) {
