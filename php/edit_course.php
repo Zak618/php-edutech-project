@@ -13,7 +13,7 @@ if (isset($_GET['id'])) {
 ?>
 
         <div class="container mt-5">
-            <form action="../php/database/update_course.php" method="post" class="row g-3 w-50" style="padding:50px; margin-top: 80px; margin-left: auto; margin-right: auto;">
+            <form action="../php/database/update_course.php" enctype="multipart/form-data" method="post" class="row g-3 w-50" style="padding:50px; margin-top: 80px; margin-left: auto; margin-right: auto;">
                 <input type="hidden" name="course_id" value="<?php echo $row['id']; ?>">
 
                 <div class="mb-3">
@@ -24,6 +24,11 @@ if (isset($_GET['id'])) {
                 <div class="mb-3">
                     <label for="description" class="form-label">Описание курса:</label>
                     <textarea class="form-control" name="description"><?php echo $row['description']; ?></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label for="image" class="form-label">Фото курса:</label>
+                    <input type="file" class="form-control" name="course_image">
                 </div>
 
                 <button type="submit" class="btn btn-primary">Сохранить изменения</button>
@@ -94,17 +99,15 @@ if (isset($_GET['id'])) {
 
                             if ($lessonsResult->num_rows > 0) {
                                 echo "<ul class='list-group mt-2'>";
-while ($lessonRow = $lessonsResult->fetch_assoc()) {
-    echo "<li class='list-group-item d-flex justify-content-between align-items-center'>
+                                while ($lessonRow = $lessonsResult->fetch_assoc()) {
+                                    echo "<li class='list-group-item d-flex justify-content-between align-items-center'>
             <a href='../../diploma-project/php/lesson_details.php?lesson_id={$lessonRow['id']}'>{$lessonRow['title']}</a>
             <span>
                 <a href='../php/database/delete_lesson.php?lesson_id={$lessonRow['id']}' class='btn btn-danger btn-sm'>Удалить урок</a>
             </span>
         </li>";
-}
-echo "</ul>";
-
-
+                                }
+                                echo "</ul>";
                             } else {
                                 echo "<p>У этого модуля пока нет уроков.</p>";
                             }
