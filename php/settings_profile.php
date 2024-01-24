@@ -2,7 +2,7 @@
 include_once "./base/header.php";
 ?>
 
-<form class="row g-3" style="width: 50%; margin-left: auto; margin-right: auto; margin-top: 20px; margin-top: 100px;" action="./database/update_profile.php" method="POST">
+<form class="row g-3" style="width: 50%; margin-left: auto; margin-right: auto; margin-top: 20px; margin-top: 100px;" action="./database/update_profile.php" method="POST" enctype="multipart/form-data">
 <div class="row mb-3">
     <label for="inputEmail3" class="col-sm-2 col-form-label">Имя</label>
     <div class="col-sm-10">
@@ -25,6 +25,12 @@ include_once "./base/header.php";
     <label for="inputPassword3" class="col-sm-2 col-form-label">Password</label>
     <div class="col-sm-10">
       <input type="text" class="form-control" id="inputPassword3" value="<?php echo $password ?>" name="password">
+    </div>
+  </div>
+  <div class="row mb-3">
+    <label for="inputImage" class="col-sm-2 col-form-label">Фото профиля</label>
+    <div class="col-sm-10">
+      <input type="file" class="form-control" id="inputImage" name="profile_image">
     </div>
   </div>
   
