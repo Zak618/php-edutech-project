@@ -2,6 +2,14 @@
 include_once "./base/header.php";
 require_once("./database/db.php");
 
+if (!isset($_SESSION['role'])) {
+    // Сохраняем URL, на который пытается зайти неаутентифицированный пользователь
+    $_SESSION['redirect_url'] = $_SERVER['REQUEST_URI'];
+    // Перенаправляем на страницу входа
+    header("Location: ../../../diploma-project/php/url_auth.php");
+    exit();
+}
+
 // Получение фото профиля из базы данных
 if ($role == 2) {
     $sql = "SELECT image FROM `teacher` WHERE email = '$email'";

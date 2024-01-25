@@ -1,6 +1,6 @@
 <?php include_once "./base/header.php"; 
 
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['role'])) {
     // Сохраняем URL, на который пытается зайти неаутентифицированный пользователь
     $_SESSION['redirect_url'] = $_SERVER['REQUEST_URI'];
     // Перенаправляем на страницу входа
