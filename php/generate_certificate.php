@@ -84,6 +84,16 @@ imagefilledrectangle($certificateImage, 0, 0, 800, 600, $backgroundColor);
 // Рисуем рамку вокруг сертификата
 imagerectangle($certificateImage, 0, 0, 799, 599, $borderColor);
 
+// Указываем путь к файлу изображения
+$imagePath = '../image/profile/EduTech.jpg'; 
+$imagePath1 = '../image/profile/pechat.jpg'; 
+// Загружаем изображение
+$logoImage = imagecreatefromjpeg($imagePath);
+$logoImage1 = imagecreatefromjpeg($imagePath1);
+
+// Копируем изображение на сертификат
+imagecopy($certificateImage, $logoImage, 50, 20, 0, 0, imagesx($logoImage), imagesy($logoImage));
+imagecopy($certificateImage, $logoImage1, 550, 350, 0, 0, imagesx($logoImage1), imagesy($logoImage1));
 // Используем выбранный шрифт
 imagettftext($certificateImage, 28, 0, 290, 60, $textColor, $fontPath, 'СЕРТИФИКАТ');
 imagettftext($certificateImage, 20, 0, 50, 150, $textColor, $fontPath, 'Выдан студенту:');

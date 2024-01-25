@@ -20,7 +20,7 @@ if (isset($_SESSION['role'])) {
         session_destroy();
 
         header("Location: ../../../diploma-project/php/start.php");
-        exit;
+        exit();
     }
 
     // Проверка, был ли выполнен запрос на выход
@@ -28,6 +28,9 @@ if (isset($_SESSION['role'])) {
         logout();
     }
 }
+
+
+
 ?>
 
 <!DOCTYPE html>

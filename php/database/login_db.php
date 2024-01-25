@@ -30,7 +30,8 @@ if ($result1->num_rows > 0) {
     exit();
 } else {
     // Ошибка авторизации
-    echo "Неверный email или пароль";
+    $_SESSION['error_message'] = "Неверный email или пароль";
+    header("Location: ../login.php");
 }
 
 ?>

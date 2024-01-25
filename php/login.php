@@ -20,6 +20,18 @@ include_once "./base/header.php";
 
         <button type="submit" class="btn btn-primary" style="width: 30%; margin-left: auto; margin-right: auto; border-radius: 10px;">Войти</button>
     </form>
+    <div class="container mt-2">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <?php
+            if (isset($_SESSION['error_message'])) {
+                echo '<div class="alert alert-danger mt-3" role="alert">' . $_SESSION['error_message'] . '</div>';
+                unset($_SESSION['error_message']); // Очистка сообщения об ошибке после отображения
+            }
+            ?>
+        </div>
+    </div>
+</div>
 
 </main>
 
