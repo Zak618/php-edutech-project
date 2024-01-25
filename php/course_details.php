@@ -2,8 +2,15 @@
 include_once "./base/header.php";
 include_once "../php/database/db.php";
 
-// Предположим, что у вас есть переменная $currentUserId, которая содержит идентификатор текущего пользователя
-$currentUserId = $id; // Замените на ваш вариант
+if (!isset($_SESSION['user_id'])) {
+    // Сохраняем URL, на который пытается зайти неаутентифицированный пользователь
+    $_SESSION['redirect_url'] = $_SERVER['REQUEST_URI'];
+    // Перенаправляем на страницу входа
+    header("Location: ../../../diploma-project/php/url_auth.php");
+    exit();
+}
+
+$currentUserId = $id; 
 
 if (isset($_GET['course_id'])) {
     $courseId = $_GET['course_id'];
@@ -14,9 +21,6 @@ if (isset($_GET['course_id'])) {
 
     if ($courseResult->num_rows > 0) {
         $course = $courseResult->fetch_assoc();
-
-        // Получите информацию о модулях и уроках
-        // Здесь вы можете использовать ваш собственный код для получения информации о модулях и уроках
 
         // Пример SQL-запроса для получения модулей
         $modulesSql = "SELECT * FROM modules WHERE course_id = '$courseId'";

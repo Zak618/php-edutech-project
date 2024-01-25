@@ -2,6 +2,14 @@
 include_once "./base/header.php";
 include_once "./database/db.php";
 
+if (!isset($_SESSION['user_id'])) {
+    // Сохраняем URL, на который пытается зайти неаутентифицированный пользователь
+    $_SESSION['redirect_url'] = $_SERVER['REQUEST_URI'];
+    // Перенаправляем на страницу входа
+    header("Location: ../../../diploma-project/php/url_auth.php");
+    exit();
+}
+
 if (isset($_GET['search'])) {
     // Если установлен параметр поиска, выполняем поиск
     $searchTerm = $_GET['search'];

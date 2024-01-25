@@ -1,5 +1,13 @@
-<!-- Файл create_course_form.php -->
-<?php include_once "./base/header.php"; ?>
+<?php include_once "./base/header.php"; 
+
+if (!isset($_SESSION['user_id'])) {
+    // Сохраняем URL, на который пытается зайти неаутентифицированный пользователь
+    $_SESSION['redirect_url'] = $_SERVER['REQUEST_URI'];
+    // Перенаправляем на страницу входа
+    header("Location: ../../../diploma-project/php/url_auth.php");
+    exit();
+}
+?>
 
 <main>
     <h2 align="center" style="margin-top: 50px;">Создать новый курс</h2>
