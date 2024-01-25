@@ -44,7 +44,14 @@ $enrolledCourses = ($enrolledResult->num_rows > 0) ? $enrolledResult->fetch_all(
                 </div>
             <?php endforeach; ?>
         <?php else: ?>
-            <p class="text-center mt-3">У вас нет записей на курсы.</p>
+            <div class="container mt-3">
+    <div class="card text-center mt-5">
+        <div class="card-body">
+            <p class="card-text">У вас нет записей на курсы.</p>
+        </div>
+    </div>
+</div>
+
         <?php endif; ?>
     </div>
 </main>
