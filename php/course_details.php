@@ -10,7 +10,7 @@ if (!isset($_SESSION['role'])) {
     exit();
 }
 
-$currentUserId = $id; 
+$currentUserId = $id;
 
 if (isset($_GET['course_id'])) {
     $courseId = $_GET['course_id'];
@@ -49,7 +49,8 @@ if (isset($_GET['course_id'])) {
             // Проверяем, что студент не записан на курс
             if (!$isEnrolled) {
                 // Добавляем запись в таблицу student_courses
-                $enrollSql = "INSERT INTO student_courses (user_id, course_id) VALUES ('$currentUserId', '$courseId')";
+                $joinDate = date('Y-m-d'); // Получаем текущую дату
+                $enrollSql = "INSERT INTO student_courses (user_id, course_id, join_date) VALUES ('$currentUserId', '$courseId', '$joinDate')";
                 if ($conn->query($enrollSql) === TRUE) {
                     // Успешно записано, редиректим на страницу "Мои курсы" студента
                     header("Location: ./my_favourate_course.php?user_id=$currentUserId&success=1");
@@ -77,12 +78,12 @@ if (isset($_GET['course_id'])) {
     <p class="text-center"><?php echo $course['description']; ?></p>
 
     <!-- Проверка, записан ли студент на этот курс -->
-    <?php if ($role == 1): ?>
-        <?php if (!$isEnrolled): ?>
+    <?php if ($role == 1) : ?>
+        <?php if (!$isEnrolled) : ?>
             <form method="post" class="text-center mt-3">
                 <input type="submit" name="enroll_course" value="Записаться на курс" class="btn btn-primary">
             </form>
-        <?php else: ?>
+        <?php else : ?>
             <form method="post" class="text-center mt-3">
                 <input type="submit" name="continue_course" value="Продолжить" class="btn btn-success">
             </form>
@@ -97,20 +98,20 @@ if (isset($_GET['course_id'])) {
     <?php endif; ?>
 
     <!-- Вывод информации о модулях -->
-    <?php if (!empty($modules)): ?>
+    <?php if (!empty($modules)) : ?>
         <h3 class="text-center mt-4">Модули:</h3>
         <ul class="list-group list-group-flush text-center">
-            <?php foreach ($modules as $module): ?>
+            <?php foreach ($modules as $module) : ?>
                 <li class="list-group-item"><?php echo $module['title']; ?></li>
             <?php endforeach; ?>
         </ul>
     <?php endif; ?>
 
     <!-- Вывод информации о уроках -->
-    <?php if (!empty($lessons)): ?>
+    <?php if (!empty($lessons)) : ?>
         <h3 class="text-center mt-4">Уроки:</h3>
         <ul class="list-group list-group-flush text-center">
-            <?php foreach ($lessons as $lesson): ?>
+            <?php foreach ($lessons as $lesson) : ?>
                 <li class="list-group-item"><?php echo $lesson['title']; ?></li>
             <?php endforeach; ?>
         </ul>
@@ -119,6 +120,30 @@ if (isset($_GET['course_id'])) {
     <!-- Отзывы -->
     <div class="mt-5">
         <h3 class="text-center">Отзывы</h3>
+
+        <!-- Средняя оценка за курс -->
+        <?php
+// Средняя оценка за курс
+$averageRatingSql = "SELECT AVG(rating) AS average_rating FROM reviews WHERE course_id = '$courseId'";
+$averageRatingResult = $conn->query($averageRatingSql);
+$averageRatingRow = $averageRatingResult->fetch_assoc();
+$averageRating = $averageRatingRow['average_rating'];
+
+echo '<div class="text-center mt-4">';
+echo '<h4>Средняя оценка за курс: ';
+
+// Проверяем, что $averageRating не null перед вызовом round()
+if ($averageRating !== null) {
+    $averageRating = round($averageRating, 2);
+    echo $averageRating;
+} else {
+    echo 'Нет оценок'; // Или любое другое значение по умолчанию
+}
+
+echo '</h4>';
+echo '</div>';
+?>
+
 
         <?php
         // Запрос для получения отзывов
@@ -159,57 +184,46 @@ if (isset($_GET['course_id'])) {
         ?>
     </div>
 
-    <!-- Средняя оценка за курс -->
-    <?php
-    $averageRatingSql = "SELECT AVG(rating) AS average_rating FROM reviews WHERE course_id = '$courseId'";
-    $averageRatingResult = $conn->query($averageRatingSql);
-    $averageRatingRow = $averageRatingResult->fetch_assoc();
-    $averageRating = round($averageRatingRow['average_rating'], 2);
 
-    echo '<div class="text-center mt-4">';
-    echo '<h4>Средняя оценка за курс: ' . $averageRating . '</h4>';
-    echo '</div>';
-    ?>
 </main>
 
 <script>
-    document.getElementById("loadMoreReviews").addEventListener("click", function () {
-    // Загружаем следующую порцию отзывов при нажатии на кнопку
-    const courseId = <?php echo $courseId; ?>;
-    const offset = document.querySelectorAll('.card').length; // Текущее количество отзывов
-    const limit = 3; // Количество отзывов для загрузки
+    document.getElementById("loadMoreReviews").addEventListener("click", function() {
+        // Загружаем следующую порцию отзывов при нажатии на кнопку
+        const courseId = <?php echo $courseId; ?>;
+        const offset = document.querySelectorAll('.card').length; // Текущее количество отзывов
+        const limit = 3; // Количество отзывов для загрузки
 
-    // Отправляем AJAX-запрос к серверу
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'load_more_reviews.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == 4 && xhr.status == 200) {
-            // Обновляем отзывы на странице
-            const newReviews = JSON.parse(xhr.responseText);
-            if (newReviews.length > 0) {
-                const reviewsContainer = document.querySelector('.mt-5');
-                newReviews.forEach(function (review) {
-                    const card = document.createElement('div');
-                    card.classList.add('card', 'mt-3');
-                    card.innerHTML = `
+        // Отправляем AJAX-запрос к серверу
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', 'load_more_reviews.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                // Обновляем отзывы на странице
+                const newReviews = JSON.parse(xhr.responseText);
+                if (newReviews.length > 0) {
+                    const reviewsContainer = document.querySelector('.mt-5');
+                    newReviews.forEach(function(review) {
+                        const card = document.createElement('div');
+                        card.classList.add('card', 'mt-3');
+                        card.innerHTML = `
                         <div class="card-header">${review.created_at}</div>
                         <div class="card-body">
                             <h5 class="card-title">Отзыв от студента #${review.student_id}</h5>
                             <p class="card-text">Оценка: ${review.rating}</p>
                             <p class="card-text">Отзыв: ${review.review}</p>
                         </div>`;
-                    reviewsContainer.appendChild(card);
-                });
-            } else {
-                // Если больше нет отзывов, скрываем кнопку
-                document.getElementById("loadMoreReviews").style.display = "none";
+                        reviewsContainer.appendChild(card);
+                    });
+                } else {
+                    // Если больше нет отзывов, скрываем кнопку
+                    document.getElementById("loadMoreReviews").style.display = "none";
+                }
             }
-        }
-    };
-    xhr.send(`course_id=${courseId}&offset=${offset}&limit=${limit}`);
-});
-
+        };
+        xhr.send(`course_id=${courseId}&offset=${offset}&limit=${limit}`);
+    });
 </script>
 
 <?php

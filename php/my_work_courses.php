@@ -24,6 +24,7 @@ include_once "../php/database/db.php";
                             <h5 class='card-title'>Название курса: {$row['title']}</h5> 
                             <p class='card-text'>$shortDescription</p>
                             <a class='btn btn-primary' href='../../diploma-project/php/edit_course.php?id={$row['id']}'>Редактировать</a>
+                            <a class='btn btn-outline-info' href='analytics.php?course_id={$row['id']}'>Аналитика</a>
                         </div>
                     </div>
                 </div>";
