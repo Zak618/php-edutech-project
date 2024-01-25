@@ -99,7 +99,7 @@ imagettftext($certificateImage, 28, 0, 290, 60, $textColor, $fontPath, 'СЕРТ
 imagettftext($certificateImage, 20, 0, 50, 150, $textColor, $fontPath, 'Выдан студенту:');
 imagettftext($certificateImage, 24, 0, 300, 150, $textColor, $fontPath, $studentInfo['name']);
 imagettftext($certificateImage, 20, 0, 50, 250, $textColor, $fontPath, 'Курс:');
-imagettftext($certificateImage, 24, 0, 150, 250, $textColor, $fontPath, $course['title']);
+imagettftext($certificateImage, 18, 0, 120, 250, $textColor, $fontPath, $course['title']);
 imagettftext($certificateImage, 20, 0, 50, 350, $textColor, $fontPath, 'Набрано баллов:');
 imagettftext($certificateImage, 24, 0, 300, 350, $textColor, $fontPath, $totalPoints);
 imagettftext($certificateImage, 20, 0, 50, 450, $textColor, $fontPath, 'Дата получения:');

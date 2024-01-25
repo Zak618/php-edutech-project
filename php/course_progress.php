@@ -10,7 +10,7 @@ if (!isset($_SESSION['role'])) {
     exit();
 }
 
-$currentUserId = $id; 
+$currentUserId = $id;
 
 if (isset($_GET['course_id'])) {
     $courseId = $_GET['course_id'];
@@ -64,18 +64,14 @@ if (isset($_GET['course_id'])) {
         <div class="list-group">
             <?php $moduleCounter = 1; ?>
             <?php foreach ($modules as $module) : ?>
-                <!-- Используем классы "list-group-item-success" для мятного цвета и "disabled" для невозможности клика -->
                 <a href="#" class="list-group-item list-group-item-action list-group-item-success disabled">
                     <?php echo $moduleCounter . '. ' . $module['title']; ?>
                 </a>
-
-                <!-- Вывод информации об уроках для каждого модуля -->
                 <?php if (!empty($lessons)) : ?>
                     <div class="list-group">
                         <?php $lessonCounter = 1; ?>
                         <?php foreach ($lessons as $lesson) : ?>
                             <?php if ($lesson['module_id'] == $module['id']) : ?>
-                                <!-- Используем класс "list-group-item-light" для белого цвета -->
                                 <a href="lesson_details.php?lesson_id=<?php echo $lesson['id']; ?>" class="list-group-item list-group-item-action ml-3 list-group-item-light">
                                     <?php echo $moduleCounter . '.' . $lessonCounter . '. ' . $lesson['title']; ?>
                                 </a>
@@ -84,7 +80,6 @@ if (isset($_GET['course_id'])) {
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
-
                 <?php $moduleCounter++; ?>
             <?php endforeach; ?>
         </div>
@@ -95,46 +90,119 @@ if (isset($_GET['course_id'])) {
     <div class="card">
         <div class="card-body">
             <?php
-            // Получаем сумму баллов студента за курс
             $totalPointsSql = "SELECT SUM(points) AS total_points FROM progress WHERE student_id = '$currentUserId' AND material_id IN (SELECT id FROM materials WHERE lesson_id IN (SELECT id FROM lessons WHERE module_id IN (SELECT id FROM modules WHERE course_id = '$courseId')))";
             $totalPointsResult = $conn->query($totalPointsSql);
             $totalPointsRow = $totalPointsResult->fetch_assoc();
             $totalPoints = $totalPointsRow['total_points'];
 
-            // Получаем общее количество баллов доступных за курс
             $totalPossiblePointsSql = "SELECT SUM(points) AS total_possible_points FROM materials WHERE lesson_id IN (SELECT id FROM lessons WHERE module_id IN (SELECT id FROM modules WHERE course_id = '$courseId'))";
             $totalPossiblePointsResult = $conn->query($totalPossiblePointsSql);
             $totalPossiblePointsRow = $totalPossiblePointsResult->fetch_assoc();
             $totalPossiblePoints = $totalPossiblePointsRow['total_possible_points'];
 
-            // Проверяем, чтобы не делить на ноль
             if ($totalPossiblePoints > 0) {
-                // Вычисляем процент выполнения курса
                 $progressPercentage = ($totalPoints / $totalPossiblePoints) * 100;
             } else {
-                // Если общее количество баллов равно нулю, устанавливаем процент выполнения в ноль
                 $progressPercentage = 0;
             }
-            // Проверяем условия для отображения кнопок
+            
             $certificateButton = "";
-            if ($progressPercentage >= 80) {
-                $certificateButton = '<a href="generate_certificate.php?course_id=' . $courseId . '" class="btn btn-primary">Получить сертификат</a>';
+            $feedback = "";
+
+            // Проверяем, есть ли отзыв для данного пользователя по данному курсу
+            $existingReviewSql = "SELECT * FROM reviews WHERE student_id = '$currentUserId' AND course_id = '$courseId'";
+            $existingReviewResult = $conn->query($existingReviewSql);
+
+                if ($progressPercentage >= 80) {
+                    $certificateButton = '<a href="generate_certificate.php?course_id=' . $courseId . '" class="btn btn-primary">Получить сертификат</a>';
+                    
+                    if ($existingReviewResult->num_rows > 0) {
+                        // Отзыв уже существует, выводим соответствующее сообщение и кнопку "Редактировать отзыв"
+                        $existingReview = $existingReviewResult->fetch_assoc();
+                        echo '<p class="alert alert-info"><strong>Оценка:</strong> ' . $existingReview['rating'] . '</p>';
+                        echo '<p class="alert alert-info"><strong>Отзыв:</strong> ' . $existingReview['review'] . '</p>';
+                        echo '<a href="edit_review.php?review_id=' . $existingReview['id'] . '" class="btn btn-warning" style="margin-bottom:20px;">Редактировать отзыв</a>';
+                    } else {
+                    $feedback = '
+            <form action="./database/submit_review.php" method="post" style="margin-top: 20px;">
+                <div class="mb-3">
+                    <label for="rating" class="form-label">Оценка</label>
+                    <div class="rating">
+                        <input type="hidden" name="rating" id="rating" value="0" required>
+                        <span class="star" data-value="1">&#9734;</span>
+                        <span class="star" data-value="2">&#9734;</span>
+                        <span class="star" data-value="3">&#9734;</span>
+                        <span class="star" data-value="4">&#9734;</span>
+                        <span class="star" data-value="5">&#9734;</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="review" class="form-label">Отзыв</label>
+                    <textarea class="form-control" id="review" name="review" rows="3" required></textarea>
+                </div>
+                <input type="hidden" name="course_id" value="' . $courseId . '">
+                <button type="submit" class="btn btn-success">Отправить отзыв</button>
+            </form>
+
+            <style>
+                .rating {
+                    display: flex;
+                    justify-content: center;
+                    cursor: pointer;
+                }
+
+                .star {
+                    font-size: 35px;
+                    margin: 0 5px;
+                    color: #ccc;
+                    transition: color 0.3s;
+                }
+
+                .star.selected {
+                    color: gold;
+                }
+            </style>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const ratingContainer = document.querySelector(".rating");
+                    const stars = ratingContainer.querySelectorAll(".star");
+                    const ratingInput = document.getElementById("rating");
+
+                    ratingContainer.addEventListener("click", function (event) {
+                        const target = event.target;
+                        if (target.classList.contains("star")) {
+                            const value = target.getAttribute("data-value");
+                            ratingInput.value = value;
+
+                            stars.forEach(function (star, index) {
+                                if (index < value) {
+                                    star.classList.add("selected");
+                                } else {
+                                    star.classList.remove("selected");
+                                }
+                            });
+                        }
+                    });
+                });
+            </script>
+        ';
             }
+                }
+                echo '<div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: ' . $progressPercentage . '%;" aria-valuenow="' . $progressPercentage . '" aria-valuemin="0" aria-valuemax="100">' . round($progressPercentage, 2) . '%</div>
+                </div>';
 
+                echo '<p class="mt-3">Набрано ' . $totalPoints . '/' . $totalPossiblePoints . ' баллов за курс.</p>';
 
-
+                echo '<div class="mt-3">';
+                echo $certificateButton;
+                if ($progressPercentage >= 80) {
+                    echo $feedback;
+                }
+                echo '</div>';
+            
             ?>
-
-            <!-- Добавляем прогресс-бар для визуализации прогресса -->
-            <div class="progress">
-                <div class="progress-bar" role="progressbar" style="width: <?php echo $progressPercentage; ?>%;" aria-valuenow="<?php echo $progressPercentage; ?>" aria-valuemin="0" aria-valuemax="100"><?php echo round($progressPercentage, 2); ?>%</div>
-            </div>
-
-            <p class="mt-3">Набрано <?php echo $totalPoints; ?>/<?php echo $totalPossiblePoints; ?> баллов за курс.</p>
-
-            <div class="mt-3">
-                <?php echo $certificateButton; ?>
-            </div>
         </div>
     </div>
 </div>
