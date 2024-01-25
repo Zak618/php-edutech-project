@@ -121,7 +121,7 @@ if (isset($_GET['course_id'])) {
                         $existingReview = $existingReviewResult->fetch_assoc();
                         echo '<p class="alert alert-info"><strong>Оценка:</strong> ' . $existingReview['rating'] . '</p>';
                         echo '<p class="alert alert-info"><strong>Отзыв:</strong> ' . $existingReview['review'] . '</p>';
-                        echo '<a href="edit_review.php?review_id=' . $existingReview['id'] . '" class="btn btn-warning" style="margin-bottom:20px;">Редактировать отзыв</a>';
+                        echo '<a href="./database/edit_review.php?review_id=' . $existingReview['id'] . '" class="btn btn-warning" style="margin-bottom:20px;">Редактировать отзыв</a>';
                     } else {
                     $feedback = '
             <form action="./database/submit_review.php" method="post" style="margin-top: 20px;">
