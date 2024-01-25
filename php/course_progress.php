@@ -11,6 +11,7 @@ if (!isset($_SESSION['role'])) {
 }
 
 $currentUserId = $id;
+$studentEmail = $email;
 
 if (isset($_GET['course_id'])) {
     $courseId = $_GET['course_id'];
@@ -21,6 +22,7 @@ if (isset($_GET['course_id'])) {
 
     if ($courseResult->num_rows > 0) {
         $course = $courseResult->fetch_assoc();
+        $courseName = $course['title']; 
 
         // Получите информацию о модулях
         $modulesSql = "SELECT * FROM modules WHERE course_id = '$courseId'";
@@ -105,7 +107,7 @@ if (isset($_GET['course_id'])) {
             } else {
                 $progressPercentage = 0;
             }
-            
+
             $certificateButton = "";
             $feedback = "";
 
@@ -113,16 +115,22 @@ if (isset($_GET['course_id'])) {
             $existingReviewSql = "SELECT * FROM reviews WHERE student_id = '$currentUserId' AND course_id = '$courseId'";
             $existingReviewResult = $conn->query($existingReviewSql);
 
-                if ($progressPercentage >= 80) {
+            if ($progressPercentage >= 80) {
+                // Проверяем, получил ли студент сертификат
+                $hasCertificateSql = "SELECT * FROM certificates WHERE student_email = '$studentEmail' AND course_name = '$courseName'";
+                $hasCertificateResult = $conn->query($hasCertificateSql);
+
+                if ($hasCertificateResult->num_rows == 0) {
+                    // Студент еще не получил сертификат, выводим кнопку
                     $certificateButton = '<a href="generate_certificate.php?course_id=' . $courseId . '" class="btn btn-primary">Получить сертификат</a>';
-                    
-                    if ($existingReviewResult->num_rows > 0) {
-                        // Отзыв уже существует, выводим соответствующее сообщение и кнопку "Редактировать отзыв"
-                        $existingReview = $existingReviewResult->fetch_assoc();
-                        echo '<p class="alert alert-warning"><strong>Оценка:</strong> ' . $existingReview['rating'] . '</p>';
-                        echo '<p class="alert alert-primary"><strong>Отзыв:</strong> ' . $existingReview['review'] . '</p>';
-                        echo '<a href="./database/edit_review.php?review_id=' . $existingReview['id'] . '" class="btn btn-outline-primary" style="margin-bottom:20px;">Редактировать отзыв</a>';
-                    } else {
+                }
+                if ($existingReviewResult->num_rows > 0) {
+                    // Отзыв уже существует, выводим соответствующее сообщение и кнопку "Редактировать отзыв"
+                    $existingReview = $existingReviewResult->fetch_assoc();
+                    echo '<p class="alert alert-warning"><strong>Оценка:</strong> ' . $existingReview['rating'] . '</p>';
+                    echo '<p class="alert alert-primary"><strong>Отзыв:</strong> ' . $existingReview['review'] . '</p>';
+                    echo '<a href="./database/edit_review.php?review_id=' . $existingReview['id'] . '" class="btn btn-outline-primary" style="margin-bottom:20px;">Редактировать отзыв</a>';
+                } else {
                     $feedback = '
             <form action="./database/submit_review.php" method="post" style="margin-top: 20px;">
                 <div class="mb-3">
@@ -187,21 +195,21 @@ if (isset($_GET['course_id'])) {
                 });
             </script>
         ';
-            }
                 }
-                echo '<div class="progress">
+            }
+            echo '<div class="progress">
                     <div class="progress-bar" role="progressbar" style="width: ' . $progressPercentage . '%;" aria-valuenow="' . $progressPercentage . '" aria-valuemin="0" aria-valuemax="100">' . round($progressPercentage, 2) . '%</div>
                 </div>';
 
-                echo '<p class="mt-3">Набрано ' . $totalPoints . '/' . $totalPossiblePoints . ' баллов за курс.</p>';
+            echo '<p class="mt-3">Набрано ' . $totalPoints . '/' . $totalPossiblePoints . ' баллов за курс.</p>';
 
-                echo '<div class="mt-3">';
-                echo $certificateButton;
-                if ($progressPercentage >= 80) {
-                    echo $feedback;
-                }
-                echo '</div>';
-            
+            echo '<div class="mt-3">';
+            echo $certificateButton;
+            if ($progressPercentage >= 80) {
+                echo $feedback;
+            }
+            echo '</div>';
+
             ?>
         </div>
     </div>
