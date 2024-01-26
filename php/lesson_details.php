@@ -2,8 +2,7 @@
 include_once "./base/header.php";
 include_once "../php/database/db.php";
 
-// Предполагаем, что у вас есть информация о пользователе и его роли
-$userRole = $role; // Замените на реальное получение роли пользователя
+$userRole = $role;
 
 if (isset($_GET['lesson_id'])) {
     $lesson_id = $_GET['lesson_id'];
@@ -20,7 +19,7 @@ if (isset($_GET['lesson_id'])) {
     if ($lessonResult->num_rows > 0) {
         $lessonRow = $lessonResult->fetch_assoc();
 
-        // Предполагаем, что creator_role - это роль создателя курса
+
         $creatorRole = 2;
 
         // Проверяем, является ли текущий пользователь создателем курса
@@ -28,6 +27,7 @@ if (isset($_GET['lesson_id'])) {
             // Получаем материалы урока
             $materialsSql = "SELECT * FROM materials WHERE lesson_id = '$lesson_id'";
             $materialsResult = $conn->query($materialsSql);
+
 ?>
             <div class="container mt-5">
                 <div class="card mb-3">
@@ -38,59 +38,69 @@ if (isset($_GET['lesson_id'])) {
                     </div>
                 </div>
 
-                <?php if ($materialsResult->num_rows > 0) { ?>
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h4 class="card-title">Материалы урока:</h4>
-                            <ol>
-                                <?php while ($materialRow = $materialsResult->fetch_assoc()) { ?>
-                                    <li>
-                                        <?php
-                                        $materialLink = ($materialRow['type'] == 'text') ? 'material.php' : 'material.php';
-                                        $materialLink .= '?material_id=' . $materialRow['id'];
+                <?php
+                if ($materialsResult->num_rows > 0) {
+                    echo '<div class="card mb-3">';
+                    echo '<div class="card-body">';
+                    echo '<h4 class="card-title">Материалы урока:</h4>';
+                    echo '<ul>';
 
-                                        // Получаем информацию о прогрессе студента для данного материала
-                                        $progressSql = "SELECT * FROM progress WHERE student_id = '$id' AND material_id = '{$materialRow['id']}'";
-                                        $progressResult = $conn->query($progressSql);
+                    while ($materialRow = $materialsResult->fetch_assoc()) {
+                        $materialLink = ($materialRow['type'] == 'text') ? 'material.php' : 'material.php';
+                        $materialLink .= '?material_id=' . $materialRow['id'];
 
-                                        // Отображаем краткую информацию о материале
-                                        echo '<a href="' . $materialLink . '">';
-                                        echo ($materialRow['type'] == 'text') ? "Текстовая информация" : "Тестовая задача";
-                                        echo '</a>';
+                        // Получаем информацию о прогрессе студента для данного материала
+                        $progressSql = "SELECT * FROM progress WHERE student_id = '$id' AND material_id = '{$materialRow['id']}'";
+                        $progressResult = $conn->query($progressSql);
 
-                                        if ($progressResult->num_rows > 0) {
-                                            $progressRow = $progressResult->fetch_assoc();
-                                            echo " ";
+                        // Отображаем краткую информацию о материале
+                        echo '<li>';
+                        echo '<a href="' . $materialLink . '">';
 
-                                            if ($progressRow['points'] > 0) {
-                                                // Если студент сдал материал, добавляем зеленую галочку
-                                                echo "<span style='color: green;'>✔</span>";
-                                            } else {
-                                                // Если студент не сдал материал, добавляем красный крестик
-                                                echo "<span style='color: red;'>✘</span>";
-                                            }
-                                        }
-                                        ?>
-                                    </li>
+                        if ($materialRow['type'] == 'text') {
+                            echo "Текстовая информация";
+                        } elseif ($materialRow['type'] == 'test') {
+                            echo "Тестовая задача";
+                        } elseif ($materialRow['type'] == 'video') {
+                            echo "Видеоматериал";
+                        }
 
-                                <?php } ?>
-                            </ol>
-                        </div>
-                    </div>
-                <?php } else { ?>
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <p class="card-text">Урок не содержит материалов.</p>
-                        </div>
-                    </div>
-                <?php } ?>
+                        echo '</a>';
 
-                <?php if ($userRole == $creatorRole) { ?>
-                    <div class="mt-3">
-                        <!-- Кнопка для добавления материала -->
-                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMaterialModal">Добавить материал</button>
-                    </div>
-                <?php } ?>
+                        if ($progressResult->num_rows > 0) {
+                            $progressRow = $progressResult->fetch_assoc();
+                            echo " ";
+
+                            if ($progressRow['points'] > 0) {
+                                // Если студент сдал материал, добавляем зеленую галочку
+                                echo "<span style='color: green;'>✔</span>";
+                            } else {
+                                // Если студент не сдал материал, добавляем красный крестик
+                                echo "<span style='color: red;'>✘</span>";
+                            }
+                        }
+
+                        echo '</li>';
+                    }
+
+                    echo '</ul>';
+                    echo '</div>';
+                    echo '</div>';
+                } else {
+                    echo '<div class="card mb-3">';
+                    echo '<div class="card-body">';
+                    echo '<p class="card-text">Урок не содержит материалов.</p>';
+                    echo '</div>';
+                    echo '</div>';
+                }
+
+                if ($userRole == $creatorRole) {
+                    echo '<div class="mt-3">';
+                    // Кнопка для добавления материала
+                    echo '<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMaterialModal">Добавить материал</button>';
+                    echo '</div>';
+                }
+                ?>
                 <!-- Модальное окно для добавления материала -->
                 <div class="modal fade" id="addMaterialModal" tabindex="-1" aria-labelledby="addMaterialModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
@@ -109,6 +119,7 @@ if (isset($_GET['lesson_id'])) {
                                         <select class='form-select' name='materialType' id='materialType' required>
                                             <option value='text'>Текстовая информация</option>
                                             <option value='test'>Тестовая задача</option>
+                                            <option value='video'>Видеоматериал</option>
                                         </select>
                                     </div>
 
@@ -144,6 +155,11 @@ if (isset($_GET['lesson_id'])) {
 
                                     </div>
 
+                                    <!-- Поля для видеоматериала -->
+                                    <div class="mb-3" id="videoMaterialFields" style="display: none;">
+                                        <label for="videoLink" class="form-label">Ссылка на видео:</label>
+                                        <input type="url" class="form-control" name="videoLink">
+                                    </div>
 
                                     <button type='submit' class='btn btn-primary'>Добавить материал</button>
                                 </form>
@@ -157,14 +173,18 @@ if (isset($_GET['lesson_id'])) {
                         var materialType = document.getElementById('materialType').value;
                         var textFields = document.getElementById('textMaterialFields');
                         var testFields = document.getElementById('testMaterialFields');
+                        var videoFields = document.getElementById('videoMaterialFields');
 
                         textFields.style.display = 'none';
                         testFields.style.display = 'none';
+                        videoFields.style.display = 'none';
 
                         if (materialType === 'text') {
                             textFields.style.display = 'block';
                         } else if (materialType === 'test') {
                             testFields.style.display = 'block';
+                        } else if (materialType === 'video') {
+                            videoFields.style.display = 'block';
                         }
                     }
 
@@ -178,7 +198,6 @@ if (isset($_GET['lesson_id'])) {
                         // Добавляем чекбокс для выбора верного ответа
                         addCorrectCheckbox(index);
                     }
-
 
                     // Функция для удаления последнего чекбокса
                     function removeCheckbox() {
@@ -213,14 +232,10 @@ if (isset($_GET['lesson_id'])) {
                         correctCheckboxContainer.appendChild(newCheckboxDiv);
                     }
 
-
-
                     document.getElementById('materialType').addEventListener('change', toggleMaterialFields);
-
 
                     toggleMaterialFields();
                 </script>
-
 
     <?php
         } else {

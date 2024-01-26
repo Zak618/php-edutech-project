@@ -118,7 +118,7 @@ if (isset($_GET['material_id'])) {
                                 <!-- Кнопка для удаления материала -->
                                 <button class="btn btn-danger" onclick="removeMaterial(<?php echo $materialRow['id']; ?>)">Удалить материал</button>
                             </div>
-                    <?php }
+                        <?php }
                     } elseif ($materialRow['type'] == 'test') {
                         echo "<h1 class='card-title'>Тестовая задача</h1>";
 
@@ -144,14 +144,42 @@ if (isset($_GET['material_id'])) {
                         }
                         ?>
                         <button type='button' id='answerButton' class='btn btn-primary' style='margin-right: 10px;' onclick='checkAnswers("<?php echo $material_id; ?>")'>Ответить</button>
-                        <?php
+                    <?php
                         if ($role == 2) {
                             echo "<button class='btn btn-danger' onclick='deleteTest(" . $material_id . ")'>Удалить тест</button>";
                         }
 
                         echo "</form>";
                         echo "<div class='mt-3' id='resultContainer'></div>";
+                    } elseif ($materialRow['type'] == 'video') {
+                        // Видео материал
+                        echo "<h1 class='card-title'>Видеоматериал</h1>";
+
+                        // Проверяем, есть ли ссылка на видео
+                        if (!empty($materialRow['video_link'])) {
+                            // Отображаем видео с помощью тега iframe
+                            echo "<div class='embed-responsive embed-responsive-16by9 mt-3'>"; // Увеличение высоты блока
+                            echo "<iframe class='embed-responsive-item' src='{$materialRow['video_link']}' allowfullscreen width='560' height='315'></iframe>";
+                            echo "</div>";
+
+                            // Добавляем кнопку "Удалить видео" только для преподавателя
+                            if ($role == 2) {
+                                echo "<div class='mt-3'>";
+                                echo "<button class='btn btn-danger' onclick='deleteVideo(" . json_encode($materialRow['id']) . ")'>Удалить видео</button>";
+
+                                echo "</div>";
+                            }
+                        } else {
+                            // Выводим сообщение, если ссылка на видео отсутствует
+                            echo "<p>Извините, видео отсутствует.</p>";
+                        }
+                    } else {
+                        // Выводим сообщение об ошибке, если тип материала неизвестен
+                        echo "<p>Неизвестный тип материала: {$materialRow['type']}</p>";
                     }
+
+
+
                     ?>
 
                 </div>
@@ -395,6 +423,32 @@ if (isset($_GET['material_id'])) {
                     });
                 }
             }
+
+            function deleteVideo(materialId) {
+    if (confirm('Вы уверены, что хотите удалить это видео?')) {
+        // Отправляем запрос на сервер для удаления видео
+        $.ajax({
+            type: 'POST',
+            url: './database/delete_video.php',
+            data: {
+                material_id: materialId
+            },
+            dataType: 'json', // Указываем, что ожидаем JSON-ответ от сервера
+            success: function(response) {
+                if (response.status === 'success') {
+                    // Перезагружаем страницу после успешного удаления
+                    location.reload();
+                } else {
+                    console.error('Ошибка удаления видео: ', response.message);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('Ошибка удаления видео:', jqXHR.responseText, errorThrown);
+            }
+        });
+    }
+}
+
         </script>
 <?php
     } else {
