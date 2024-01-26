@@ -94,10 +94,11 @@ if (isset($_GET['material_id'])) {
                             <li class="<?php echo $navItemClass; ?>">
                                 <a class="<?php echo $navLinkClass; ?>" href="<?php echo $navMaterialLink; ?>">
                                     <?php
-                                    echo ($navMaterial['type'] == 'text') ? "Текстовая информация" : "Тестовая задача";
+                                    echo ($navMaterial['type'] == 'text') ? "Текстовая информация" : ($navMaterial['type'] == 'test' ? "Тестовая задача" : "Видеоматериал");
                                     ?>
                                 </a>
                             </li>
+
                         <?php } ?>
                     </ul>
                 </div>
@@ -425,30 +426,29 @@ if (isset($_GET['material_id'])) {
             }
 
             function deleteVideo(materialId) {
-    if (confirm('Вы уверены, что хотите удалить это видео?')) {
-        // Отправляем запрос на сервер для удаления видео
-        $.ajax({
-            type: 'POST',
-            url: './database/delete_video.php',
-            data: {
-                material_id: materialId
-            },
-            dataType: 'json', // Указываем, что ожидаем JSON-ответ от сервера
-            success: function(response) {
-                if (response.status === 'success') {
-                    // Перезагружаем страницу после успешного удаления
-                    location.reload();
-                } else {
-                    console.error('Ошибка удаления видео: ', response.message);
+                if (confirm('Вы уверены, что хотите удалить это видео?')) {
+                    // Отправляем запрос на сервер для удаления видео
+                    $.ajax({
+                        type: 'POST',
+                        url: './database/delete_video.php',
+                        data: {
+                            material_id: materialId
+                        },
+                        dataType: 'json', // Указываем, что ожидаем JSON-ответ от сервера
+                        success: function(response) {
+                            if (response.status === 'success') {
+                                // Перезагружаем страницу после успешного удаления
+                                location.reload();
+                            } else {
+                                console.error('Ошибка удаления видео: ', response.message);
+                            }
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                            console.error('Ошибка удаления видео:', jqXHR.responseText, errorThrown);
+                        }
+                    });
                 }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                console.error('Ошибка удаления видео:', jqXHR.responseText, errorThrown);
             }
-        });
-    }
-}
-
         </script>
 <?php
     } else {
