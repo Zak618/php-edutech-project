@@ -33,27 +33,28 @@ if (isset($_GET['course_id'])) {
         $totalCertificates = $certificatesResult->fetch_assoc()['total_certificates'];
 
         $daysAttendance = [];
-$today = date('Y-m-d');
-date_default_timezone_set('Europe/Moscow'); // Устанавливаем временную зону на Московское время
+        $today = date('Y-m-d');
+        date_default_timezone_set('Europe/Moscow'); // Устанавливаем временную зону на Московское время
 
-for ($i = 0; $i < 5; $i++) {
-    $currentDate = date('Y-m-d', strtotime("-$i days"));
-    $attendanceSql = "SELECT COUNT(DISTINCT user_id) AS daily_students
+        for ($i = 0; $i < 5; $i++) {
+            $currentDate = date('Y-m-d', strtotime("-$i days"));
+            $attendanceSql = "SELECT COUNT(DISTINCT user_id) AS daily_students
                       FROM student_courses
                       WHERE course_id = '$courseId' AND DATE(join_date) = '$currentDate'";
-    $attendanceResult = $conn->query($attendanceSql);
-    $dailyStudents = $attendanceResult->fetch_assoc()['daily_students'];
-    $daysAttendance[] = $dailyStudents;
-}
+            $attendanceResult = $conn->query($attendanceSql);
+            $dailyStudents = $attendanceResult->fetch_assoc()['daily_students'];
+            $daysAttendance[] = $dailyStudents;
+        }
 
-// Восстанавливаем временную зону на дефолтную после использования
-date_default_timezone_set('UTC');
+        // Восстанавливаем временную зону на дефолтную после использования
+        date_default_timezone_set('UTC');
 
 
 ?>
 
         <div class="container mt-5">
-            <h1>Аналитика по курсу: <?php echo $course['title']; ?></h1>
+            <h1>Отчет на <?php echo date('d.m.Y'); ?></h1>
+            <h3>Аналитика по курсу: <?php echo $course['title']; ?></h3>
 
             <ul>
                 <li>Всего модулей на курсе: <?php echo $totalModules; ?></li>
@@ -64,43 +65,43 @@ date_default_timezone_set('UTC');
 
             <canvas id="attendanceChart" width="400" height="200"></canvas>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            var ctx = document.getElementById('attendanceChart').getContext('2d');
-            
-            // Здесь используем данные посещаемости по дням
-            var attendanceData = {
-                labels: [
-        '<?php echo date_format(date_create(date('Y-m-d', strtotime("-3 days"))), 'Y-m-d'); ?>',
-        '<?php echo date_format(date_create(date('Y-m-d', strtotime("-2 days"))), 'Y-m-d'); ?>',
-        '<?php echo date_format(date_create(date('Y-m-d', strtotime("-1 days"))), 'Y-m-d'); ?>',
-        '<?php echo date_format(date_create(date('Y-m-d', strtotime("0 days"))), 'Y-m-d'); ?>',
-        '<?php echo date_format(date_create(date('Y-m-d', strtotime("+1 days"))), 'Y-m-d'); ?>'
-    ],
-                datasets: [{
-                    label: 'Студенты, присоединившиеся к курсу',
-                    data: <?php echo json_encode(array_reverse($daysAttendance)); ?>,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                }]
-            };
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    var ctx = document.getElementById('attendanceChart').getContext('2d');
 
-            var options = {
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            };
+                    // Здесь используем данные посещаемости по дням
+                    var attendanceData = {
+                        labels: [
+                            '<?php echo date_format(date_create(date('Y-m-d', strtotime("-3 days"))), 'Y-m-d'); ?>',
+                            '<?php echo date_format(date_create(date('Y-m-d', strtotime("-2 days"))), 'Y-m-d'); ?>',
+                            '<?php echo date_format(date_create(date('Y-m-d', strtotime("-1 days"))), 'Y-m-d'); ?>',
+                            '<?php echo date_format(date_create(date('Y-m-d', strtotime("0 days"))), 'Y-m-d'); ?>',
+                            '<?php echo date_format(date_create(date('Y-m-d', strtotime("+1 days"))), 'Y-m-d'); ?>'
+                        ],
+                        datasets: [{
+                            label: 'Студенты, присоединившиеся к курсу',
+                            data: <?php echo json_encode(array_reverse($daysAttendance)); ?>,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    };
 
-            var attendanceChart = new Chart(ctx, {
-                type: 'bar',
-                data: attendanceData,
-                options: options
-            });
-        });
-    </script>
+                    var options = {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    };
+
+                    var attendanceChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: attendanceData,
+                        options: options
+                    });
+                });
+            </script>
         </div>
 
 <?php

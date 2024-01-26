@@ -127,8 +127,8 @@ if (isset($_GET['lesson_id'])) {
                                         <label for="testMaterialPoints" class="form-label mt-3">Количество баллов:</label>
                                         <input type="number" class="form-control" name="testMaterialPoints" value="0" min="0">
 
-                                        <label for="testMaterialAttempts" class="form-label mt-3">Количество попыток (необязательно):</label>
-                                        <input type="number" class="form-control" name="testMaterialAttempts" min="1" max="10">
+                                        <label for="testMaterialAttempts" class="form-label mt-3">Количество попыток:</label>
+                                        <input type="number" class="form-control" name="testMaterialAttempts" min="1" max="10000">
 
                                         <label for="testMaterialOptions" class="form-label mt-3">Варианты ответов:</label>
                                         <div id="checkboxContainer" class="mb-3">
