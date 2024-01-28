@@ -42,28 +42,35 @@ if (isset($_SESSION['role'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <style>
-    /* Добавьте стили для уведомлений */
-.notification-item {
-    padding: 10px;
-    margin-bottom: 10px;
-    background-color: #f8d7da; /* Цвет фона для уведомлений об ошибке (можете изменить под свой дизайн) */
-    color: #721c24; /* Цвет текста для уведомлений об ошибке (можете изменить под свой дизайн) */
-    border: 1px solid #f5c6cb; /* Цвет границы для уведомлений об ошибке (можете изменить под свой дизайн) */
-    border-radius: 5px;
-}
+    /* Стили для уведомлений */
+    .notification-item {
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        border-radius: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
 
-/* Стили для модального окна с уведомлениями */
-#notificationsModalBody {
-    max-height: 300px; /* Максимальная высота модального окна с уведомлениями (можете изменить под свой дизайн) */
-    overflow-y: auto; /* Добавление прокрутки, если уведомлений больше, чем можно отобразить */
-}
+    .notification-item p {
+        margin: 0;
+    }
 
-/* Добавьте стиль для иконки уведомлений в панели навигации */
-#notifications-icon.text-danger {
-    color: #dc3545; /* Цвет иконки уведомлений (можете изменить под свой дизайн) */
-}
+    .notification-item small {
+        color: #999;
+    }
 
+    /* Стили для модального окна с уведомлениями */
+    #notificationsModalBody {
+        max-height: 300px;
+        overflow-y: auto;
+    }
 </style>
+
+
 <body>
     <div class="header">
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
@@ -86,15 +93,6 @@ if (isset($_SESSION['role'])) {
                                 <a class="nav-link" href="../../../diploma-project/php/my_work_courses.php">Преподавание</a>
                             </li>
                         <?php } ?>
-
-                        <!-- Добавим иконку уведомлений для преподавателя -->
-                        <?php if ($role == 2) { ?>
-                            <li class="nav-item">
-                                <a class="nav-link" href="#" id="notifications-icon" data-bs-toggle="modal" data-bs-target="#notificationsModal">
-                                    <i class="fas fa-bell"></i>
-                                </a>
-                            </li>
-                        <?php } ?>
                     </ul>
 
                     <form class="d-flex" role="search" method="GET" action="../php/search_results.php">
@@ -108,8 +106,16 @@ if (isset($_SESSION['role'])) {
                                 <a class="btn btn-outline-success dropdown-toggle" role="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="margin-left: 5px;">
                                     <?php echo $name; ?>
                                 </a>
-                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <ul class="dropdown-menu dropdown-menu-lg-end" aria-labelledby="dropdownMenuButton">
                                     <a class="dropdown-item" href="../../../diploma-project/php/profile.php">Профиль</a>
+                                    <?php if ($role == 2) { ?>
+                                        <a class="btn" id="notifications-btn" style="margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#notificationsModal">
+    Уведомления
+</a>
+
+
+
+                                    <?php } ?>
                                     <a class="dropdown-item" href="../../../diploma-project/php/settings_profile.php">Настройки</a>
                                     <a class="dropdown-item" href="?logout=true">Выйти</a>
                                 </ul>
@@ -125,7 +131,7 @@ if (isset($_SESSION['role'])) {
 
 
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
     // Получение уведомлений с сервера
     function getNotifications() {
         return fetch('../../../diploma-project/php/notifications.php?teacher_id=<?php echo $teacher_id; ?>')
@@ -162,17 +168,18 @@ if (isset($_SESSION['role'])) {
         }
     }
 
-
     // Проверка наличия уведомлений и отображение иконки
     getNotifications()
         .then(notifications => {
             console.log('Fetched notifications:', notifications); // Log the fetched notifications for debugging
 
             if (notifications && Array.isArray(notifications)) {
-                document.getElementById('notifications-icon').classList.add('text-danger');
-                document.getElementById('notifications-icon').addEventListener('click', function () {
+                // Убираем красное выделение кнопки
+                document.getElementById('notifications-btn').classList.remove('btn-danger');
+                document.getElementById('notifications-btn').addEventListener('click', function() {
                     displayNotifications(notifications);
                 });
+
             } else {
                 console.error('Invalid response format or no notifications found.');
             }
@@ -182,8 +189,7 @@ if (isset($_SESSION['role'])) {
         });
 });
 
-
-</script>
+    </script>
 
 
     <!-- Модальное окно для уведомлений -->
