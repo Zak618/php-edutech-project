@@ -1,9 +1,8 @@
 <?php
 session_start();
-$role = null; // Инициализируем переменную $role
+$role = null;
 
 if (isset($_SESSION['role'])) {
-    // Пользователь авторизован
     $role = $_SESSION['role'];
     $name = $_SESSION['name'];
     $email = $_SESSION['email'];
@@ -23,13 +22,10 @@ if (isset($_SESSION['role'])) {
         exit();
     }
 
-    // Проверка, был ли выполнен запрос на выход
     if (isset($_GET['logout'])) {
         logout();
     }
 }
-
-
 
 ?>
 
@@ -45,8 +41,29 @@ if (isset($_SESSION['role'])) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
+<style>
+    /* Добавьте стили для уведомлений */
+.notification-item {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f8d7da; /* Цвет фона для уведомлений об ошибке (можете изменить под свой дизайн) */
+    color: #721c24; /* Цвет текста для уведомлений об ошибке (можете изменить под свой дизайн) */
+    border: 1px solid #f5c6cb; /* Цвет границы для уведомлений об ошибке (можете изменить под свой дизайн) */
+    border-radius: 5px;
+}
 
+/* Стили для модального окна с уведомлениями */
+#notificationsModalBody {
+    max-height: 300px; /* Максимальная высота модального окна с уведомлениями (можете изменить под свой дизайн) */
+    overflow-y: auto; /* Добавление прокрутки, если уведомлений больше, чем можно отобразить */
+}
 
+/* Добавьте стиль для иконки уведомлений в панели навигации */
+#notifications-icon.text-danger {
+    color: #dc3545; /* Цвет иконки уведомлений (можете изменить под свой дизайн) */
+}
+
+</style>
 <body>
     <div class="header">
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
@@ -70,13 +87,22 @@ if (isset($_SESSION['role'])) {
                             </li>
                         <?php } ?>
 
+                        <!-- Добавим иконку уведомлений для преподавателя -->
+                        <?php if ($role == 2) { ?>
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" id="notifications-icon" data-bs-toggle="modal" data-bs-target="#notificationsModal">
+                                    <i class="fas fa-bell"></i>
+                                </a>
+                            </li>
+                        <?php } ?>
                     </ul>
-                    
-                        <form class="d-flex" role="search" method="GET" action="../php/search_results.php">
-                            <input class="form-control me-2" type="search" placeholder="Найти курс" aria-label="Search" name="search">
-                            <button class="btn btn-outline-success" type="submit">Поиск</button>
-                        </form>
-                        <form class="d-flex" role="search">
+
+                    <form class="d-flex" role="search" method="GET" action="../php/search_results.php">
+                        <input class="form-control me-2" type="search" placeholder="Найти курс" aria-label="Search" name="search">
+                        <button class="btn btn-outline-success" type="submit">Поиск</button>
+                    </form>
+
+                    <form class="d-flex" role="search">
                         <?php if ($role == 1 || $role == 2) { ?>
                             <div class="dropdown">
                                 <a class="btn btn-outline-success dropdown-toggle" role="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="margin-left: 5px;">
@@ -96,3 +122,84 @@ if (isset($_SESSION['role'])) {
             </div>
         </nav>
     </div>
+
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    // Получение уведомлений с сервера
+    function getNotifications() {
+        return fetch('../../../diploma-project/php/notifications.php?teacher_id=<?php echo $teacher_id; ?>')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            });
+    }
+
+    // Функция для отображения уведомлений
+    function displayNotifications(notifications) {
+        var notificationsModalBody = document.getElementById('notificationsModalBody');
+        notificationsModalBody.innerHTML = '';
+
+        if (notifications.length > 0) {
+            notifications.forEach(notification => {
+                var notificationItem = document.createElement('div');
+                notificationItem.className = 'notification-item';
+
+                // Преобразуйте timestamp в объект Date и затем отформатируйте его
+                var date = new Date(notification.creation_time * 1000); // умножьте на 1000, так как JavaScript использует миллисекунды
+                var formattedDate = date.toLocaleString();
+
+                notificationItem.innerHTML = `
+                    <p>${notification.message}</p>
+                    <small>${formattedDate}</small>
+                `;
+                notificationsModalBody.appendChild(notificationItem);
+            });
+
+            $('#notificationsModal').modal('show');
+        }
+    }
+
+
+    // Проверка наличия уведомлений и отображение иконки
+    getNotifications()
+        .then(notifications => {
+            console.log('Fetched notifications:', notifications); // Log the fetched notifications for debugging
+
+            if (notifications && Array.isArray(notifications)) {
+                document.getElementById('notifications-icon').classList.add('text-danger');
+                document.getElementById('notifications-icon').addEventListener('click', function () {
+                    displayNotifications(notifications);
+                });
+            } else {
+                console.error('Invalid response format or no notifications found.');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching or processing notifications:', error.message);
+        });
+});
+
+
+</script>
+
+
+    <!-- Модальное окно для уведомлений -->
+    <div class="modal fade" id="notificationsModal" tabindex="-1" aria-labelledby="notificationsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="notificationsModalLabel">Уведомления</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="notificationsModalBody">
+                    <!-- Здесь отобразятся уведомления -->
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

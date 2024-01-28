@@ -22,7 +22,7 @@ if (isset($_GET['course_id'])) {
 
     if ($courseResult->num_rows > 0) {
         $course = $courseResult->fetch_assoc();
-        $courseName = $course['title']; 
+        $courseName = $course['title'];
 
         // Получите информацию о модулях
         $modulesSql = "SELECT * FROM modules WHERE course_id = '$courseId'";
@@ -118,11 +118,11 @@ if (isset($_GET['course_id'])) {
                     )
                 )
             ) AS combined_points";
-$totalPointsResult = $conn->query($totalPointsSql);
-$totalPointsRow = $totalPointsResult->fetch_assoc();
-$totalPoints = $totalPointsRow['total_points'];
+            $totalPointsResult = $conn->query($totalPointsSql);
+            $totalPointsRow = $totalPointsResult->fetch_assoc();
+            $totalPoints = $totalPointsRow['total_points'];
 
-$totalPossiblePointsSql = "SELECT SUM(points) AS total_possible_points
+            $totalPossiblePointsSql = "SELECT SUM(points) AS total_possible_points
                     FROM (
                         SELECT points FROM materials
                         WHERE lesson_id IN (
@@ -142,15 +142,15 @@ $totalPossiblePointsSql = "SELECT SUM(points) AS total_possible_points
                             )
                         )
                     ) AS combined_possible_points";
-$totalPossiblePointsResult = $conn->query($totalPossiblePointsSql);
-$totalPossiblePointsRow = $totalPossiblePointsResult->fetch_assoc();
-$totalPossiblePoints = $totalPossiblePointsRow['total_possible_points'];
+            $totalPossiblePointsResult = $conn->query($totalPossiblePointsSql);
+            $totalPossiblePointsRow = $totalPossiblePointsResult->fetch_assoc();
+            $totalPossiblePoints = $totalPossiblePointsRow['total_possible_points'];
 
-if ($totalPossiblePoints > 0) {
-$progressPercentage = ($totalPoints / $totalPossiblePoints) * 100;
-} else {
-$progressPercentage = 0;
-}
+            if ($totalPossiblePoints > 0) {
+                $progressPercentage = ($totalPoints / $totalPossiblePoints) * 100;
+            } else {
+                $progressPercentage = 0;
+            }
             $certificateButton = "";
             $feedback = "";
 
