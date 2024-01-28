@@ -90,7 +90,10 @@ if (isset($_GET['course_id'])) {
             <?php
             if (isset($_POST['continue_course'])) {
                 // Редиректим на страницу с модулями и уроками
-                header("Location: course_progress.php?course_id=$courseId");
+                echo '<script type="text/javascript">';
+                echo 'window.location.href = "course_progress.php?course_id=' . $courseId . '";';
+                echo '</script>';
+
                 exit();
             }
             ?>
@@ -123,26 +126,26 @@ if (isset($_GET['course_id'])) {
 
         <!-- Средняя оценка за курс -->
         <?php
-// Средняя оценка за курс
-$averageRatingSql = "SELECT AVG(rating) AS average_rating FROM reviews WHERE course_id = '$courseId'";
-$averageRatingResult = $conn->query($averageRatingSql);
-$averageRatingRow = $averageRatingResult->fetch_assoc();
-$averageRating = $averageRatingRow['average_rating'];
+        // Средняя оценка за курс
+        $averageRatingSql = "SELECT AVG(rating) AS average_rating FROM reviews WHERE course_id = '$courseId'";
+        $averageRatingResult = $conn->query($averageRatingSql);
+        $averageRatingRow = $averageRatingResult->fetch_assoc();
+        $averageRating = $averageRatingRow['average_rating'];
 
-echo '<div class="text-center mt-4">';
-echo '<h4>Средняя оценка за курс: ';
+        echo '<div class="text-center mt-4">';
+        echo '<h4>Средняя оценка за курс: ';
 
-// Проверяем, что $averageRating не null перед вызовом round()
-if ($averageRating !== null) {
-    $averageRating = round($averageRating, 2);
-    echo $averageRating;
-} else {
-    echo 'Нет оценок'; // Или любое другое значение по умолчанию
-}
+        // Проверяем, что $averageRating не null перед вызовом round()
+        if ($averageRating !== null) {
+            $averageRating = round($averageRating, 2);
+            echo $averageRating;
+        } else {
+            echo 'Нет оценок'; // Или любое другое значение по умолчанию
+        }
 
-echo '</h4>';
-echo '</div>';
-?>
+        echo '</h4>';
+        echo '</div>';
+        ?>
 
 
         <?php

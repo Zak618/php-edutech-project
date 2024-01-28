@@ -4,6 +4,7 @@ include_once "../php/database/db.php";
 
 $userRole = $role;
 
+
 if (isset($_GET['lesson_id'])) {
     $lesson_id = $_GET['lesson_id'];
 
@@ -19,7 +20,6 @@ if (isset($_GET['lesson_id'])) {
     if ($lessonResult->num_rows > 0) {
         $lessonRow = $lessonResult->fetch_assoc();
 
-
         $creatorRole = 2;
 
         // Проверяем, является ли текущий пользователь создателем курса
@@ -27,6 +27,10 @@ if (isset($_GET['lesson_id'])) {
             // Получаем материалы урока
             $materialsSql = "SELECT * FROM materials WHERE lesson_id = '$lesson_id'";
             $materialsResult = $conn->query($materialsSql);
+
+            // Получаем все задания для данного урока
+            $assignmentsSql = "SELECT * FROM assignments WHERE lesson_id = '$lesson_id'";
+            $assignmentsResult = $conn->query($assignmentsSql);
 
 ?>
             <div class="container mt-5">
@@ -39,12 +43,13 @@ if (isset($_GET['lesson_id'])) {
                 </div>
 
                 <?php
-                if ($materialsResult->num_rows > 0) {
+
+                if ($materialsResult->num_rows > 0 || $assignmentsResult->num_rows > 0) {
                     echo '<div class="card mb-3">';
                     echo '<div class="card-body">';
                     echo '<h4 class="card-title">Материалы урока:</h4>';
                     echo '<ul>';
-
+                    
                     while ($materialRow = $materialsResult->fetch_assoc()) {
                         $materialLink = ($materialRow['type'] == 'text') ? 'material.php' : 'material.php';
                         $materialLink .= '?material_id=' . $materialRow['id'];
@@ -64,7 +69,7 @@ if (isset($_GET['lesson_id'])) {
                         } elseif ($materialRow['type'] == 'video') {
                             echo "Видеоматериал";
                         }
-
+                        
                         echo '</a>';
 
                         if ($progressResult->num_rows > 0) {
@@ -82,7 +87,14 @@ if (isset($_GET['lesson_id'])) {
 
                         echo '</li>';
                     }
-
+                   
+                    while ($assignmentRow = $assignmentsResult->fetch_assoc()) {
+                        echo '<li>';
+                        echo '<a href="assignment.php?assignment_id=' . $assignmentRow['id'] . '">';
+                        echo 'Задание: ' . $assignmentRow['title'];
+                        echo '</a>';
+                        echo '</li>';
+                    } 
                     echo '</ul>';
                     echo '</div>';
                     echo '</div>';
@@ -93,12 +105,15 @@ if (isset($_GET['lesson_id'])) {
                     echo '</div>';
                     echo '</div>';
                 }
-
+                include_once "./add_assignment_modal.php";
                 if ($userRole == $creatorRole) {
                     echo '<div class="mt-3">';
                     // Кнопка для добавления материала
                     echo '<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addMaterialModal">Добавить материал</button>';
                     echo '</div>';
+                    echo '<div class="mt-3">';
+            echo '<button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addAssignmentModal">Добавить задание</button>';
+            echo '</div>';
                 }
                 ?>
                 <!-- Модальное окно для добавления материала -->

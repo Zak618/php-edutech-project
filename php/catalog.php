@@ -61,10 +61,14 @@ $result = $conn->query($sql);
                         if (!empty($imageData)) {
                             $courseImage = './database/' . $imageData;
                         } else {
-                            $courseImage = '../image/course/image_course.jpg';
+                            $courseImages = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg'];
+                            $randomImage = $courseImages[array_rand($courseImages)];
+                            $courseImage = '../image/course/' . $randomImage;
                         }
                     } else {
-                        $courseImage = '../image/course/image_course.jpg';
+                        $courseImages = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg'];
+                        $randomImage = $courseImages[array_rand($courseImages)];
+                        $courseImage = '../image/course/' . $randomImage;
                     }
 
                     // Получаем среднюю оценку для курса

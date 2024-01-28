@@ -2,8 +2,8 @@
 include_once "./base/header.php";
 include_once "../php/database/db.php";
 
-// Предположим, что у вас есть переменная $currentUserId, которая содержит идентификатор текущего пользователя
-$currentUserId = $id; // Замените на ваш вариант
+
+$currentUserId = $id; 
 
 // Проверяем наличие параметра user_id в URL
 $user_id = isset($_GET['user_id']) ? $_GET['user_id'] : $currentUserId;
