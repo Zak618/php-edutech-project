@@ -88,9 +88,15 @@ if (isset($_SESSION['role'])) {
                             <li class="nav-item">
                                 <a class="nav-link" href="../../../diploma-project/php/my_favourate_course.php">Моё обучение</a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="../../../diploma-project/php/help.php">Помощь</a>
+                            </li>
                         <?php } else if ($role == 2) { ?>
                             <li class="nav-item">
                                 <a class="nav-link" href="../../../diploma-project/php/my_work_courses.php">Преподавание</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="../../../diploma-project/php/help.php">Помощь</a>
                             </li>
                         <?php } ?>
                     </ul>
@@ -110,8 +116,8 @@ if (isset($_SESSION['role'])) {
                                     <a class="dropdown-item" href="../../../diploma-project/php/profile.php">Профиль</a>
                                     <?php if ($role == 2) { ?>
                                         <a class="btn" id="notifications-btn" style="margin-left: 5px;" data-bs-toggle="modal" data-bs-target="#notificationsModal">
-    Уведомления
-</a>
+                                            Уведомления
+                                        </a>
 
 
 
@@ -132,63 +138,62 @@ if (isset($_SESSION['role'])) {
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-    // Получение уведомлений с сервера
-    function getNotifications() {
-        return fetch('../../../diploma-project/php/notifications.php?teacher_id=<?php echo $teacher_id; ?>')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! Status: ${response.status}`);
-                }
-                return response.json();
-            });
-    }
+            // Получение уведомлений с сервера
+            function getNotifications() {
+                return fetch('../../../diploma-project/php/notifications.php?teacher_id=<?php echo $teacher_id; ?>')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    });
+            }
 
-    // Функция для отображения уведомлений
-    function displayNotifications(notifications) {
-        var notificationsModalBody = document.getElementById('notificationsModalBody');
-        notificationsModalBody.innerHTML = '';
+            // Функция для отображения уведомлений
+            function displayNotifications(notifications) {
+                var notificationsModalBody = document.getElementById('notificationsModalBody');
+                notificationsModalBody.innerHTML = '';
 
-        if (notifications.length > 0) {
-            notifications.forEach(notification => {
-                var notificationItem = document.createElement('div');
-                notificationItem.className = 'notification-item';
+                if (notifications.length > 0) {
+                    notifications.forEach(notification => {
+                        var notificationItem = document.createElement('div');
+                        notificationItem.className = 'notification-item';
 
-                // Преобразуйте timestamp в объект Date и затем отформатируйте его
-                var date = new Date(notification.creation_time * 1000); // умножьте на 1000, так как JavaScript использует миллисекунды
-                var formattedDate = date.toLocaleString();
+                        // Преобразуйте timestamp в объект Date и затем отформатируйте его
+                        var date = new Date(notification.creation_time * 1000); // умножьте на 1000, так как JavaScript использует миллисекунды
+                        var formattedDate = date.toLocaleString();
 
-                notificationItem.innerHTML = `
+                        notificationItem.innerHTML = `
                     <p>${notification.message}</p>
                     <small>${formattedDate}</small>
                 `;
-                notificationsModalBody.appendChild(notificationItem);
-            });
+                        notificationsModalBody.appendChild(notificationItem);
+                    });
 
-            $('#notificationsModal').modal('show');
-        }
-    }
-
-    // Проверка наличия уведомлений и отображение иконки
-    getNotifications()
-        .then(notifications => {
-            console.log('Fetched notifications:', notifications); // Log the fetched notifications for debugging
-
-            if (notifications && Array.isArray(notifications)) {
-                // Убираем красное выделение кнопки
-                document.getElementById('notifications-btn').classList.remove('btn-danger');
-                document.getElementById('notifications-btn').addEventListener('click', function() {
-                    displayNotifications(notifications);
-                });
-
-            } else {
-                console.error('Invalid response format or no notifications found.');
+                    $('#notificationsModal').modal('show');
+                }
             }
-        })
-        .catch(error => {
-            console.error('Error fetching or processing notifications:', error.message);
-        });
-});
 
+            // Проверка наличия уведомлений и отображение иконки
+            getNotifications()
+                .then(notifications => {
+                    console.log('Fetched notifications:', notifications); // Log the fetched notifications for debugging
+
+                    if (notifications && Array.isArray(notifications)) {
+                        // Убираем красное выделение кнопки
+                        document.getElementById('notifications-btn').classList.remove('btn-danger');
+                        document.getElementById('notifications-btn').addEventListener('click', function() {
+                            displayNotifications(notifications);
+                        });
+
+                    } else {
+                        console.error('Invalid response format or no notifications found.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching or processing notifications:', error.message);
+                });
+        });
     </script>
 
 
