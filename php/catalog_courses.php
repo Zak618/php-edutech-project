@@ -10,7 +10,7 @@ if (!isset($_SESSION['role'])) {
     exit();
 }
 // Пример объявления переменной $currentUserId
-$currentUserId = $id; 
+$currentUserId = $id;
 
 // Получаем информацию о курсах
 $sql = "SELECT courses.id, courses.title, courses.description, teacher.name, courses.teacher_id
@@ -125,11 +125,42 @@ while ($row = $userCoursesResult->fetch_assoc()) {
             } else {
                 echo '<p align="center">Пока что пусто!<br>Но скоро здесь появятся новые курсы!</p>';
             }
+            // Получаем уникальные категории
+            $categoriesSql = "SELECT DISTINCT categories.id, categories.name FROM categories
+INNER JOIN courses ON categories.id = courses.category_id";
+            $categoriesResult = $conn->query($categoriesSql);
+            $categories = $categoriesResult->fetch_all(MYSQLI_ASSOC);
+
             ?>
+            
+            <div style="margin-bottom: 90px;">
+            <h2 align="center" style="margin-top: 50px; color: #053163">Категории</h2>
+            <!-- Овальная форма для отображения категорий -->
+            <div class="d-flex justify-content-center mt-4">
+                <?php
+                foreach ($categories as $category) {
+                    echo '<button type="button" class="btn btn-primary me-2" data-category="' . $category['id'] . '">' . $category['name'] . '</button>';
+                }
+                ?>
+            </div>
+            </div>
         </div>
     </div>
 
 </main>
+<script>
+    // Скрипт для фильтрации курсов по категориям
+    document.addEventListener("DOMContentLoaded", function () {
+        const categoryButtons = document.querySelectorAll('.btn-primary');
+
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const categoryId = this.getAttribute('data-category');
+                window.location.href = 'filtered_courses.php?category=' + categoryId;
+            });
+        });
+    });
+</script>
 
 <?php
 include_once "./base/footer.php";

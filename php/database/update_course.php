@@ -4,6 +4,7 @@ require_once("./db.php");
 $course_id = $_POST['course_id'];
 $title = $_POST['title'];
 $description = $_POST['description'];
+$category_id = isset($_POST['category']) ? $_POST['category'] : null;
 
 // Обработка загрузки изображения
 if (isset($_FILES['course_image']) && $_FILES['course_image']['error'] === UPLOAD_ERR_OK) {
@@ -35,7 +36,7 @@ if (isset($_FILES['course_image']) && $_FILES['course_image']['error'] === UPLOA
     }
 } else {
     // Если файл не был загружен, просто обновляем информацию о курсе без изображения
-    $sql = "UPDATE `courses` SET title='$title', description='$description' WHERE id=$course_id";
+    $sql = "UPDATE courses SET title = '$title', description = '$description', category_id = '$category_id' WHERE id = '$course_id'";
 }
 
 if ($conn->query($sql) === TRUE) {

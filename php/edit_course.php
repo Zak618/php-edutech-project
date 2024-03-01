@@ -31,6 +31,23 @@ if (isset($_GET['id'])) {
                     <input type="file" class="form-control" name="course_image">
                 </div>
 
+                <div class="mb-3">
+                    <label for="category" class="form-label">Категория курса:</label>
+                    <select class="form-select" name="category">
+                        <option value="">Выберите категорию</option>
+                        <?php
+                            $categoriesSql = "SELECT * FROM categories";
+                            $categoriesResult = $conn->query($categoriesSql);
+
+                            while ($categoryRow = $categoriesResult->fetch_assoc()) {
+                                $selected = ($categoryRow['id'] == $row['category_id']) ? "selected" : "";
+                                echo "<option value='{$categoryRow['id']}' {$selected}>{$categoryRow['name']}</option>";
+                            }
+                        ?>
+                    </select>
+                </div>
+
+
                 <button type="submit" class="btn btn-primary">Сохранить изменения</button>
             </form>
 

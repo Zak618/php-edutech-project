@@ -6,7 +6,7 @@
                     <use xlink:href="#bootstrap"></use>
                 </svg>
             </a>
-            <span class="mb-3 mb-md-0 text-body-secondary">© 2023 EduTech Company, Inc</span>
+            <span class="mb-3 mb-md-0 text-body-secondary">© 2024 EduTech Company, Inc</span>
         </div>
 
 
