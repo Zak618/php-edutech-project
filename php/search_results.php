@@ -1,7 +1,9 @@
 <?php
 include_once "./base/header.php";
 include_once "./database/db.php";
+?>
 
+<?php
 if (!isset($_SESSION['role'])) {
     // Сохраняем URL, на который пытается зайти неаутентифицированный пользователь
     $_SESSION['redirect_url'] = $_SERVER['REQUEST_URI'];
@@ -22,9 +24,8 @@ if (isset($_GET['search'])) {
     exit();
 }
 
-include_once "./base/header.php";
-// Пример объявления переменной $currentUserId
-$currentUserId = $id; // Замените на ваш вариант
+
+$currentUserId = $id;
 
 ?>
 

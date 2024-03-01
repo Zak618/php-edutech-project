@@ -1,5 +1,6 @@
 <?php
 session_start();
+ob_start();
 $role = null;
 
 if (isset($_SESSION['role'])) {
@@ -82,7 +83,7 @@ if (isset($_SESSION['role'])) {
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="../../../diploma-project/php/catalog.php">Каталог</a>
+                            <a class="nav-link active" aria-current="page" href="../../../diploma-project/php/catalog_courses.php">Каталог</a>
                         </li>
                         <?php if ($role == 1) { ?>
                             <li class="nav-item">

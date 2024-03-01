@@ -19,6 +19,13 @@ $sql = "SELECT courses.id, courses.title, courses.description, teacher.name, cou
         WHERE courses.teacher_id IS NOT NULL";
 $result = $conn->query($sql);
 
+$userCoursesSql = "SELECT course_id FROM student_courses WHERE user_id = '$currentUserId'";
+$userCoursesResult = $conn->query($userCoursesSql);
+$userCourses = [];
+while ($row = $userCoursesResult->fetch_assoc()) {
+    $userCourses[] = $row['course_id'];
+}
+
 // Если есть курсы, выводим информацию о каждом курсе
 ?>
 <main>
@@ -48,7 +55,7 @@ $result = $conn->query($sql);
                 while ($row = $result->fetch_assoc()) {
                     // Определяем, принадлежит ли курс текущему пользователю
                     $isUserCourse = ($role == 2 && $currentUserId === $row['teacher_id']);
-
+                    $isUserTakingCourse = in_array($row['id'], $userCourses);
                     // Обрезаем описание до 100 символов и добавляем многоточие, если описание длиннее
                     $shortDescription = strlen($row['description']) > 100 ? substr($row['description'], 0, 100) . '...' : $row['description'];
                     // Получаем информацию о фото курса из базы данных
@@ -106,8 +113,13 @@ $result = $conn->query($sql);
                             echo '<a href="edit_course.php?id=' . $row['id'] . '" class="btn btn-primary">Редактировать</a>';
                         }
                     } elseif ($role == 1) {
-                        // Если пользователь - студент, то выводим кнопку "Проходить"
-                        echo '<a href="course_details.php?course_id=' . $row['id'] . '" class="btn btn-primary">Проходить</a>';
+                        if ($isUserTakingCourse) {
+                            // Если пользователь уже проходит курс, выводим зеленую кнопку "Продолжить"
+                            echo '<a href="course_details.php?course_id=' . $row['id'] . '" class="btn btn-success">Продолжить</a>';
+                        } else {
+                            // Если пользователь не проходит курс, выводим обычную кнопку "Проходить"
+                            echo '<a href="course_details.php?course_id=' . $row['id'] . '" class="btn btn-primary">Проходить</a>';
+                        }
                     }
                     echo '</div></div></div></div></div>';
                 }
