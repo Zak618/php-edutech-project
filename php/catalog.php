@@ -118,7 +118,7 @@ while ($row = $userCoursesResult->fetch_assoc()) {
                             echo '<a href="course_details.php?course_id=' . $row['id'] . '" class="btn btn-success">Продолжить</a>';
                         } else {
                             // Если пользователь не проходит курс, выводим обычную кнопку "Проходить"
-                            echo '<a href="course_details.php?course_id=' . $row['id'] . '" class="btn btn-primary">Проходить</a>';
+                            echo '<a href="course_details.php?course_id=' . $row['id'] . '" class="btn btn-primary">Записать на курс</a>';
                         }
                     }
                     echo '</div></div></div></div></div>';
