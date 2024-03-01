@@ -93,8 +93,8 @@ while ($row = $userCoursesResult->fetch_assoc()) {
                     echo '<div class="card-body" style="height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 0px;">';
 
                     echo '<div>';
-                    echo '<h5 class="card-title" style="margin-bottom: 10px;">Название: ' . $row['title'] . '</h5>';
-                    echo '<p class="card-text" style="margin-bottom: 10px;">Описание: ' . $shortDescription . '</p>';
+                    echo '<h5 class="card-title" style="margin-bottom: 10px;">' . $row['title'] . '</h5>';
+                    echo '<p class="card-text" style="margin-bottom: 10px;">' . $shortDescription . '</p>';
                     echo '<p class="card-text" style="margin-bottom: 10px;">Преподаватель: ' . $row['name'] . '</p>'; // Выводим имя преподавателя
                     echo '</div>';
 
