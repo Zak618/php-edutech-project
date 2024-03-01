@@ -1,6 +1,12 @@
 <?php
 include_once "../php/database/db.php";
 
+session_start();
+if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
+    // Перенаправление на страницу входа или другую страницу для неавторизованных пользователей
+    header("Location: admin_login.php");
+}
+
 // Запрос к базе данных для получения всех заявок
 $query = "SELECT * FROM help";
 $result = mysqli_query($conn, $query);
@@ -12,7 +18,6 @@ if (isset($_POST['delete_course'])) {
     mysqli_query($conn, $sql_delete_course);
     // Дополнительные действия, например, перенаправление на admin.php
     header('Location: admin.php');
-    exit();
 }
 
 // Редактирование курса

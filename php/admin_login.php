@@ -2,6 +2,7 @@
 session_start();
 include_once "../php/database/db.php";
 
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Проверка учетных данных
     $input_username = $_POST['username'];
