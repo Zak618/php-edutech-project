@@ -38,6 +38,7 @@ $default_image = '../image/profile/1.svg';
 
 <div class="container mt-4">
     <div class="card mt-4">
+        <?php if ($role == 1) { ?>
         <div class="card-body">
             <?php
             $certificates_sql = "SELECT course_name, certificate_url FROM certificates WHERE student_email = '$email'";
@@ -52,6 +53,11 @@ $default_image = '../image/profile/1.svg';
             }
             ?>
         </div>
+        <?php } else { 
+            echo 'Это Ваш профиль! Можете его редактировать';
+        }
+        ?>
+
     </div>
 </div>
 

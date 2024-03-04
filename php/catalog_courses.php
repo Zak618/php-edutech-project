@@ -44,7 +44,27 @@ while ($row = $userCoursesResult->fetch_assoc()) {
             color: #007bff;
         }
     </style>
+    <?php
+    $categoriesSql = "SELECT DISTINCT categories.id, categories.name FROM categories
+INNER JOIN courses ON categories.id = courses.category_id";
+            $categoriesResult = $conn->query($categoriesSql);
+            $categories = $categoriesResult->fetch_all(MYSQLI_ASSOC);
+
+            ?>
+            
+            <div style="margin-bottom: 90px;">
+            <h2 align="center" style="margin-top: 50px; color: #053163">Категории</h2>
+            <!-- Овальная форма для отображения категорий -->
+            <div class="d-flex justify-content-center mt-4">
+                <?php
+                foreach ($categories as $category) {
+                    echo '<button type="button" class="btn btn-primary me-2" data-category="' . $category['id'] . '">' . $category['name'] . '</button>';
+                }
+                ?>
+            </div>
+            </div>
     <div style="background-color: #EFEFEF; padding-top:20px">
+    
         <h2 align="center" style="margin-top: 50px; color: #053163">Курсы</h2>
         <p align="center" style="margin-top: 20px; font-size: 20px; font-weight: 200;">Начинай учиться прямо сейчас.</p>
 
@@ -125,25 +145,9 @@ while ($row = $userCoursesResult->fetch_assoc()) {
             } else {
                 echo '<p align="center">Пока что пусто!<br>Но скоро здесь появятся новые курсы!</p>';
             }
-            // Получаем уникальные категории
-            $categoriesSql = "SELECT DISTINCT categories.id, categories.name FROM categories
-INNER JOIN courses ON categories.id = courses.category_id";
-            $categoriesResult = $conn->query($categoriesSql);
-            $categories = $categoriesResult->fetch_all(MYSQLI_ASSOC);
-
-            ?>
             
-            <div style="margin-bottom: 90px;">
-            <h2 align="center" style="margin-top: 50px; color: #053163">Категории</h2>
-            <!-- Овальная форма для отображения категорий -->
-            <div class="d-flex justify-content-center mt-4">
-                <?php
-                foreach ($categories as $category) {
-                    echo '<button type="button" class="btn btn-primary me-2" data-category="' . $category['id'] . '">' . $category['name'] . '</button>';
-                }
-                ?>
-            </div>
-            </div>
+            ?>
+        
         </div>
     </div>
 
