@@ -52,6 +52,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
+    // Обновление даты последнего обновления курса
+    $updateCourseSql = "UPDATE courses SET last_updated = CURRENT_TIMESTAMP WHERE id = (
+        SELECT course_id FROM modules WHERE id = (
+            SELECT module_id FROM lessons WHERE id = '$lesson_id'
+        )
+    )";
+    $conn->query($updateCourseSql);
+
+
     // Перенаправляем пользователя обратно на страницу урока
     header("Location: ../../../diploma-project/php/lesson_details.php?lesson_id=$lesson_id");
     exit;  // Добавляем exit после успешного завершения
