@@ -165,12 +165,42 @@ if (isset($_GET['course_id'])) {
             // Выводим отзывы
             for ($i = 0; $i < $reviewsToShow; $i++) {
                 $review = $reviewsResult->fetch_assoc();
+                // Форматируем дату, чтобы она была более понятной
+                $months = [
+                    "January" => "января",
+                    "February" => "февраля",
+                    "March" => "марта",
+                    "April" => "апреля",
+                    "May" => "мая",
+                    "June" => "июня",
+                    "July" => "июля",
+                    "August" => "августа",
+                    "September" => "сентября",
+                    "October" => "октября",
+                    "November" => "ноября",
+                    "December" => "декабря"
+                ];
+
+                // Получение даты в английском формате
+                $englishDate = date("d F Y", strtotime($review['created_at']));
+
+                // Разбиение даты на компоненты
+                list($day, $month, $year) = explode(" ", $englishDate);
+
+                // Замена английского названия месяца на русское
+                $russianMonth = $months[$month];
+
+                // Сборка итоговой даты
+                $prettyDate = $day . ' ' . $russianMonth . ' ' . $year;
+
                 echo '<div class="card mt-3">';
-                echo '<div class="card-header">' . $review['created_at'] . '</div>';
+                echo '<div class="card-header">';
+                echo '<span class="date">' . $prettyDate . '</span>';
+                echo '</div>';
                 echo '<div class="card-body">';
                 echo '<h5 class="card-title">Отзыв от студента #' . $review['student_id'] . '</h5>';
-                echo '<p class="card-text">Оценка: ' . $review['rating'] . '</p>';
-                echo '<p class="card-text">Отзыв: ' . $review['review'] . '</p>';
+                echo '<p class="card-text"><strong>Оценка:</strong> <span class="rating">' . $review['rating'] . '</span></p>';
+                echo '<p class="card-text"><strong>Отзыв:</strong> ' . htmlspecialchars($review['review']) . '</p>';
                 echo '</div>';
                 echo '</div>';
             }
@@ -228,7 +258,64 @@ if (isset($_GET['course_id'])) {
         xhr.send(`course_id=${courseId}&offset=${offset}&limit=${limit}`);
     });
 </script>
+<style>
+    .card {
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+        /* Отступ между карточками отзывов */
+        border: none;
+    }
 
+    .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid #eceeef;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        padding: 10px 15px;
+        font-size: 14px;
+        color: #333;
+        font-weight: 500;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .date {
+        font-size: 12px;
+        color: #666;
+        background-color: #e2e3e5;
+        border-radius: 12px;
+        padding: 2px 10px;
+        margin-left: 10px;
+        font-weight: bold;
+    }
+
+
+    .card-body {
+        padding: 20px;
+        line-height: 1.5;
+        color: #555;
+    }
+
+    .card-title {
+        margin-bottom: 15px;
+        color: #000;
+        font-size: 16px;
+        font-weight: bold;
+    }
+
+    .card-text {
+        margin-bottom: 10px;
+        font-size: 14px;
+    }
+
+    .rating {
+        color: #ffdd00;
+        font-size: 16px;
+    }
+</style>
 <?php
 include_once "./base/footer.php";
 ?>
