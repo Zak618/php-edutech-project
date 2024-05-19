@@ -32,7 +32,7 @@ if ($result->num_rows > 0) {
 
 // Обработка загрузки изображения
 if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] === UPLOAD_ERR_OK) {
-    $uploadDir = "images/";  // Измените на ваш желаемый каталог
+    $uploadDir = "";  // Измените на ваш желаемый каталог
 
     // Убедимся, что каталог существует
     if (!file_exists($uploadDir)) {
